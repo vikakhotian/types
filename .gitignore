@@ -1,0 +1,69 @@
+# Дополнительная защита: не влияет на уже отслеживаемые файлы и историю.
+# Закрытое хранить вне публичного checkout; эти пути — страховка.
+/private/
+/confidential/
+/client-data/
+/research-private/
+/course-materials/
+/raw-imports/
+/local-backups/
+/local/
+
+# Переменные окружения и секреты; пример разрешён только без реальных значений.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+credentials.json
+service-account*.json
+secrets.json
+secrets.yaml
+secrets.yml
+cookies.txt
+cookies.json
+*.har
+
+# Локальные базы, журналы и резервные копии редакторов.
+*.sqlite
+*.sqlite3
+*.db
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+
+# Кэши, зависимости и генерируемые результаты будущих инструментов.
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+coverage/
+.next/
+.nuxt/
+/dist/
+/build/
+/tmp/
+/temp/
+/renders/
+
+# Нет общих запретов на assets/, SVG, WebP, AVIF, PNG, JPG или PDF:
+# публичные ресурсы добавляются после проверки прав и разрешения.
+# Видео, архивы и учебные исходники не добавлять автоматически;
+# при отдельной задаче выбрать закрытое хранилище и точечные исключения.
