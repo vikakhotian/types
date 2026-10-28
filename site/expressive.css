@@ -131,3 +131,58 @@ body{background:var(--paper)}
 .scene-0,.scene-1,.scene-2{background-position-y:0%}
 .scene-3,.scene-4,.scene-5{background-position-y:49%}
 .scene-6,.scene-7,.scene-8{background-position-y:97%}
+
+/* Complete the palette in dialogs, controls and secondary text as well. */
+.reading-progress span{background:#d53d7c}
+.video-invite,.video-rate,.volume-panel,.player-controls,.review-footnote,.test-footer{color:#593e34}
+.video-circle{border-color:#9b8069;background:#fffef9}.video-circle:after{border-color:#c5a98b}
+.video-overlay{background:#593e34e8;border-color:#fffdf8}
+.player-controls,.volume-panel{border-color:#cbb69f;background:#fffaf1}
+.player-controls input,.volume-panel input{accent-color:#976c43}
+.video-rate{border-color:#bca286;background:#fffef9}
+.author-video>.drawn-arrow,.editorial-smile{color:#d53d7c}
+.level-step-number,.level:nth-child(3n+2) .level-step-number,.level:nth-child(3n) .level-step-number{color:#593e34}
+.level-toggle:before,.level-toggle:after{background:#795a43}
+.levels:before{border-color:#cfb995}
+.level-badge{background:#f9e7ad;border-color:#b39856}
+.level-badge svg{color:#92661e}
+.level:nth-child(3n+2) .level-badge{background:#f7cbdc;border-color:#d28ca7}
+.level:nth-child(3n+2) .level-badge svg{color:#b94b77}
+.level:nth-child(3n) .level-badge{background:#c8e5dd;border-color:#82afa3}
+.level:nth-child(3n) .level-badge svg{color:#3a7773}
+.level[open]{outline-color:#c2ab8e}
+.review,.review:nth-child(even){border-color:#baa48d!important}
+.review-avatar,.dialog-avatar{border-color:#b59b80}
+.reviews-section:before{border-color:#bca68d}
+.card-dialog,.card-dialog.review-dialog{border-color:#80634b;border-radius:3px 5px 2px 4px;background:#fffef9;box-shadow:5px 6px 0 #6a503233}
+.card-dialog::backdrop{background:#3e3028b8}
+.card-dialog h2{color:#593e34}
+.back-top{background:#fcf1c9;border-color:#a88a5f;color:#795a43}
+.menu-toggle{background:#fff8e7;border-color:#ad9579}.menu-toggle span{background:#795a43}
+.site-header nav{border-color:#c9b49e}
+.site-header nav a:hover{color:#593e34}
+.site-header nav a:hover:after{background:#f3d7df}
+.fit-column li svg{color:#926b3d;border-color:#c1a17d;background:#fff9e7}
+.fit-column.no li svg{color:#3f7166;border-color:#8aafa3;background:#edf7f1}
+.bonus-1>.icon{color:#3f7166}
+.bonus-title{display:block!important;font-weight:700;margin-bottom:0!important}
+.bonus-title+br{display:none}
+
+/* Anchor this drawing to the last phrase, not the width of its paragraph. */
+.speech-second{width:auto;max-width:100%;padding-bottom:57px;line-height:1.25}
+.speech-second:after{display:none}
+.explain-phrase{display:inline-block;position:relative;white-space:nowrap}
+.explain-arrow{display:block;position:absolute;right:0;top:100%;width:95px;height:55px;color:#c5829b;pointer-events:none}
+.intro-copy .copy-break{display:block}
+
+/* Thin imperfect outlines recall a paper insert instead of a UI card. */
+.hero{border:0;outline:0}
+.hero:before{display:block!important;content:'';position:absolute;inset:3px;width:auto;height:auto;border:0;transform:none;z-index:0;pointer-events:none;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 700' preserveAspectRatio='none'%3E%3Cpath d='M3 4C246 2 531 6 997 3L996 695C722 698 365 694 3 697Z' fill='none' stroke='%23856950' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M8 9C352 12 704 7 992 9L991 690C613 692 348 689 9 692Z' fill='none' stroke='%23e6ca67' stroke-width='.8' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center/100% 100% no-repeat}
+.insert,.insert:nth-child(3n+2),.insert:nth-child(3n){border-color:transparent;outline:0;border-radius:0}
+.insert:before{content:'';position:absolute;inset:1px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 600' preserveAspectRatio='none'%3E%3Cpath d='M2 3C160 1 292 4 398 2L397 597C235 599 98 596 2 598Z' fill='none' stroke='%23816650' stroke-width='1' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M6 7 394 6 393 593 7 594Z' fill='none' stroke='%23dec461' stroke-width='.8' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center/100% 100% no-repeat}
+.insert .scene,.dialog-scene{mask-image:linear-gradient(to right,transparent,#000 4%,#000 96%,transparent),linear-gradient(to bottom,transparent,#000 4%,#000 93%,transparent);mask-composite:intersect}
+.card-dialog:after{content:'';position:absolute;inset:5px;pointer-events:none;border:1px solid #e5ce7e;opacity:.65}
+@media(max-width:760px){.speech-second{padding-bottom:55px}.explain-arrow{width:88px;height:52px}.bonus{padding-top:41px}}
+/* A review keeps the same paper and tilt in all three looping copies. */
+.review,.review:nth-child(even){background:#fffef9;transform:rotate(-.5deg)}
+.review[data-review="1"],.review[data-review="3"],.review[data-review="5"],.review[data-review="7"],.review[data-review="9"]{background:#fff5f8;transform:rotate(.6deg)}

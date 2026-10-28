@@ -55,10 +55,22 @@
       originals.forEach((el,i)=>{const clone=el.cloneNode(true);clone.dataset.clone='true';clone.setAttribute('aria-hidden','true');clone.tabIndex=-1;clone.removeAttribute('data-source-line');clone.querySelectorAll('[data-source-line]').forEach(n=>n.removeAttribute('data-source-line'));fragment.append(clone);});
       if(side==='before')track.prepend(fragment);else track.append(fragment);
     }
-    let cycle=0, step=0, visible=1, timer;
-    const moveTo=x=>track.scrollTo({left:x,behavior:scrollBehavior()});
+    let cycle=0, step=0, visible=1, timer, navigationIndex=null;
+    const moveTo=x=>{
+      navigationIndex=((Math.round((x-cycle)/step)%count)+count)%count;
+      track.scrollTo({left:x,behavior:scrollBehavior()});
+    };
     const jump=x=>{track.style.scrollSnapType='none';track.scrollTo({left:x,behavior:'instant'});requestAnimationFrame(()=>track.style.scrollSnapType='');};
-    const normalize=()=>{if(!cycle)return;let x=track.scrollLeft;if(x<cycle-1)jump(x+cycle);else if(x>=cycle*2-1)jump(x-cycle);};
+    const normalize=()=>{
+      if(!cycle)return;
+      const card=Math.round((track.scrollLeft-cycle)/step);
+      const logical=(card%count+count)%count;
+      // A cancelled animation may emit scrollend before the latest request
+      // arrives. Do not replace that request with an intermediate card.
+      if(navigationIndex!==null && logical!==navigationIndex)return;
+      if(card<0 || card>=count)jump(cycle+logical*step);
+      navigationIndex=null;
+    };
     const update=()=>{
       if(dots && step && dots.children.length){
         // Round to the nearest card, wrap within the original set, then clamp
@@ -71,14 +83,43 @@
     };
     const resize=()=>{
       const gap=parseFloat(getComputedStyle(track).columnGap)||0;
-      step=count>1?originals[1].offsetLeft-originals[0].offsetLeft:originals[0].getBoundingClientRect().width+gap;cycle=step*count;visible=Math.max(1,Math.floor((track.clientWidth+gap+1)/step));
+      // offsetLeft/offsetWidth round fractional grid columns to whole pixels.
+      // Repeating that rounded value would slowly shift the infinite seam.
+      const cardWidth=parseFloat(getComputedStyle(originals[0]).width);
+      const logical=step?((Math.round((track.scrollLeft-cycle)/step)%count)+count)%count:0;
+      step=cardWidth+gap;cycle=step*count;
+      const styles=getComputedStyle(track);
+      const inner=track.clientWidth-parseFloat(styles.paddingLeft)-parseFloat(styles.paddingRight);
+      visible=Math.max(1,Math.floor((inner+gap+.5)/step));
       if(dots){dots.replaceChildren();for(let i=0;i<Math.ceil(count/visible);i++){const d=document.createElement('button');d.type='button';d.setAttribute('aria-label',`Карточки: страница ${i+1}`);d.addEventListener('click',()=>moveTo(cycle+i*visible*step));dots.append(d);}}
-      prev.disabled=false;next.disabled=false;jump(cycle);update();
+      prev.disabled=false;next.disabled=false;navigationIndex=null;jump(cycle+logical*step);update();
     };
-    prev.addEventListener('click',()=>{normalize();moveTo(track.scrollLeft-step*visible)});
-    next.addEventListener('click',()=>{normalize();moveTo(track.scrollLeft+step*visible)});
+    const advance=direction=>{
+      const pending=navigationIndex;
+      if(pending===null)normalize();
+      const actual=Math.round((track.scrollLeft-cycle)/step);
+      const current=pending===null?((actual%count+count)%count):pending;
+      const nextIndex=((current+direction*visible)%count+count)%count;
+      navigationIndex=nextIndex;
+      // Rapid clicks count every requested group and settle it directly;
+      // a single click retains the normal smooth transition.
+      if(pending!==null){jump(cycle+nextIndex*step);update();return;}
+      let destination=cycle+(current+direction*visible)*step;
+      const max=track.scrollWidth-track.clientWidth;
+      if(destination<0 || destination>max){
+        const shift=destination<0?cycle:-cycle;
+        destination+=shift;
+        const shifted=track.scrollLeft+shift;
+        if(shifted<0 || shifted>max){jump(cycle+nextIndex*step);update();return;}
+        jump(shifted);
+      }
+      moveTo(destination);
+    };
+    prev.addEventListener('click',()=>advance(-1));
+    next.addEventListener('click',()=>advance(1));
+    ['pointerdown','touchstart','wheel'].forEach(event=>track.addEventListener(event,()=>{navigationIndex=null;},{passive:true}));
     track.addEventListener('scroll',update,{passive:true});track.addEventListener('scrollend',normalize);
-    track.addEventListener('keydown',e=>{if(e.target===track&&['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();normalize();moveTo(track.scrollLeft+(e.key==='ArrowRight'?1:-1)*step*visible);}});
+    track.addEventListener('keydown',e=>{if(e.target===track&&['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();advance(e.key==='ArrowRight'?1:-1);}});
     new ResizeObserver(resize).observe(track);resize();
     return originals;
   }
