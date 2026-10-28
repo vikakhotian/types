@@ -47,48 +47,37 @@
   });
   updateScroll();
 
-  const track = $('#topic-track');
-  const cards = $$('.topic-card');
-  const dots = $('#topic-dots');
-  const topicPrev = $('#topics-prev');
-  const topicNext = $('#topics-next');
-  let pageStep = 0;
-  let pages = 1;
-  const calculateCarousel = () => {
-    const gap = parseFloat(getComputedStyle(track).columnGap) || 20;
-    const step = cards[0].getBoundingClientRect().width + gap;
-    const visible = Math.max(1, Math.floor((track.clientWidth + gap + 1) / step));
-    pageStep = step * visible;
-    const nextPages = Math.ceil(cards.length / visible);
-    if (nextPages !== pages || !dots.childElementCount) {
-      pages = nextPages;
-      dots.replaceChildren();
-      for (let i = 0; i < pages; i++) {
-        const dot = document.createElement('button');
-        dot.type = 'button';
-        dot.setAttribute('aria-label', `Карточки: страница ${i + 1}`);
-        dot.addEventListener('click', () => track.scrollTo({ left: i * pageStep, behavior: scrollBehavior() }));
-        dots.append(dot);
-      }
+  function infiniteCarousel(track, itemSelector, prev, next, dots=null) {
+    const originals=[...track.querySelectorAll(itemSelector)];
+    const count=originals.length;
+    for(const side of ['before','after']) {
+      const fragment=document.createDocumentFragment();
+      originals.forEach((el,i)=>{const clone=el.cloneNode(true);clone.dataset.clone='true';clone.setAttribute('aria-hidden','true');clone.tabIndex=-1;clone.removeAttribute('data-source-line');clone.querySelectorAll('[data-source-line]').forEach(n=>n.removeAttribute('data-source-line'));fragment.append(clone);});
+      if(side==='before')track.prepend(fragment);else track.append(fragment);
     }
-    updateCarousel();
-  };
-  const updateCarousel = () => {
-    const max = track.scrollWidth - track.clientWidth;
-    const page = track.scrollLeft >= max - 4 ? pages - 1 : Math.round(track.scrollLeft / Math.max(1, pageStep));
-    $$('.dots button').forEach((dot, i) => dot.setAttribute('aria-current', String(i === page)));
-    topicPrev.disabled = track.scrollLeft < 4;
-    topicNext.disabled = track.scrollLeft >= max - 4;
-  };
-  topicPrev.addEventListener('click', () => track.scrollBy({ left: -pageStep, behavior: scrollBehavior() }));
-  topicNext.addEventListener('click', () => track.scrollBy({ left: pageStep, behavior: scrollBehavior() }));
-  track.addEventListener('scroll', updateCarousel, { passive: true });
-  track.addEventListener('keydown', e => {
-    if (e.target !== track || !['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
-    e.preventDefault();
-    track.scrollBy({ left: pageStep * (e.key === 'ArrowRight' ? 1 : -1), behavior: scrollBehavior() });
-  });
-  new ResizeObserver(calculateCarousel).observe(track);
+    let cycle=0, step=0, visible=1, timer;
+    const moveTo=x=>track.scrollTo({left:x,behavior:scrollBehavior()});
+    const jump=x=>{track.style.scrollSnapType='none';track.scrollTo({left:x,behavior:'instant'});requestAnimationFrame(()=>track.style.scrollSnapType='');};
+    const normalize=()=>{if(!cycle)return;let x=track.scrollLeft;if(x<cycle-1)jump(x+cycle);else if(x>=cycle*2-1)jump(x-cycle);};
+    const update=()=>{
+      if(dots){const logical=((track.scrollLeft-cycle)/step%count+count)%count;const page=Math.floor((logical+.1)/visible);[...dots.children].forEach((d,i)=>d.setAttribute('aria-current',String(i===page)));}
+      clearTimeout(timer);timer=setTimeout(normalize,140);
+    };
+    const resize=()=>{
+      const gap=parseFloat(getComputedStyle(track).columnGap)||0;
+      step=count>1?originals[1].offsetLeft-originals[0].offsetLeft:originals[0].getBoundingClientRect().width+gap;cycle=step*count;visible=Math.max(1,Math.floor((track.clientWidth+gap+1)/step));
+      if(dots){dots.replaceChildren();for(let i=0;i<Math.ceil(count/visible);i++){const d=document.createElement('button');d.type='button';d.setAttribute('aria-label',`Карточки: страница ${i+1}`);d.addEventListener('click',()=>moveTo(cycle+i*visible*step));dots.append(d);}}
+      prev.disabled=false;next.disabled=false;jump(cycle);update();
+    };
+    prev.addEventListener('click',()=>{normalize();moveTo(track.scrollLeft-step*visible)});
+    next.addEventListener('click',()=>{normalize();moveTo(track.scrollLeft+step*visible)});
+    track.addEventListener('scroll',update,{passive:true});track.addEventListener('scrollend',normalize);
+    track.addEventListener('keydown',e=>{if(e.target===track&&['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();normalize();moveTo(track.scrollLeft+(e.key==='ArrowRight'?1:-1)*step*visible);}});
+    new ResizeObserver(resize).observe(track);resize();
+    return originals;
+  }
+  const track=$('#topic-track');
+  const cards=infiniteCarousel(track,'.topic-card',$('#topics-prev'),$('#topics-next'),$('#topic-dots'));
 
   const topics = JSON.parse($('#topic-data').textContent);
   const reviews = JSON.parse($('#review-data').textContent);
@@ -108,14 +97,16 @@
     dialog.showModal();
     document.body.style.overflow = 'hidden';
   };
-  cards.forEach(card => card.addEventListener('click', () => {
-    const topic = topics[Number(card.dataset.topic)];
-    openDialog(card, topic.title, topic.question, topic.scene);
-  }));
-  $$('.review').forEach(card => card.addEventListener('click', () => {
-    const review = reviews[Number(card.dataset.review)];
-    openDialog(card, review.name, review.quote, null, Number(card.dataset.review));
-  }));
+  track.addEventListener('click', e => {
+    const card=e.target.closest('.topic-card'); if(!card)return;
+    const i=Number(card.dataset.topic),topic=topics[i];
+    openDialog(cards[i],topic.title,topic.question,topic.scene);
+  });
+  $('#review-track').addEventListener('click',e=>{
+    const card=e.target.closest('.review');if(!card)return;
+    const i=Number(card.dataset.review),review=reviews[i];
+    openDialog($('#review-track').querySelector(`.review:not([data-clone])[data-review="${i}"]`),review.name,review.quote,null,i);
+  });
   $('#dialog-close').addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', e => {
     if (e.target !== dialog) return;
@@ -127,18 +118,7 @@
     dialogTrigger?.focus({ preventScroll: true });
   });
 
-  const reviewTrack = $('#review-track');
-  const reviewPrev = $('#reviews-prev');
-  const reviewNext = $('#reviews-next');
-  const updateReviews = () => {
-    reviewPrev.disabled = reviewTrack.scrollLeft < 3;
-    reviewNext.disabled = reviewTrack.scrollLeft >= reviewTrack.scrollWidth - reviewTrack.clientWidth - 3;
-  };
-  reviewPrev.addEventListener('click', () => reviewTrack.scrollBy({ left: -Math.max(280, reviewTrack.clientWidth * .8), behavior: scrollBehavior() }));
-  reviewNext.addEventListener('click', () => reviewTrack.scrollBy({ left: Math.max(280, reviewTrack.clientWidth * .8), behavior: scrollBehavior() }));
-  reviewTrack.addEventListener('scroll', updateReviews, { passive: true });
-  new ResizeObserver(updateReviews).observe(reviewTrack);
-  updateReviews();
+  infiniteCarousel($('#review-track'),'.review',$('#reviews-prev'),$('#reviews-next'));
 
   $$('[aria-disabled="true"]').forEach(button => button.addEventListener('click', e => e.preventDefault()));
 
@@ -148,19 +128,8 @@
   const seek = $('#video-seek');
   const time = $('#video-time');
   const mute = $('#video-mute');
-  video.defaultPlaybackRate = 1.08;
-  video.playbackRate = 1.08;
-  video.preservesPitch = true;
-  const rateButton = $('#video-rate');
-  const rates = [1.08, 1, 1.15];
-  let rateIndex = 0;
-  rateButton.addEventListener('click', () => {
-    rateIndex = (rateIndex + 1) % rates.length;
-    video.playbackRate = rates[rateIndex];
-    const label = String(rates[rateIndex]).replace('.', ',');
-    rateButton.textContent = label + '×';
-    rateButton.setAttribute('aria-label', `Скорость видео: ${label}. Нажать, чтобы изменить`);
-  });
+  video.defaultPlaybackRate=1;video.playbackRate=1;video.preservesPitch=true;
+  $('#video-rate').addEventListener('change', e=>{video.playbackRate=Number(e.target.value);});
   const playPath = 'm7 3 15 9-15 9V3Z';
   const pausePath = 'M7 3v18M17 3v18';
   const formatTime = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
@@ -192,13 +161,6 @@
     mute.setAttribute('aria-label', video.muted ? 'Включить звук' : 'Выключить звук');
     mute.setAttribute('aria-pressed', String(video.muted));
     mute.style.opacity = video.muted ? '.5' : '1';
-  });
-  $('#video-fullscreen').addEventListener('click', async () => {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else if ($('#video-player').requestFullscreen) await $('#video-player').requestFullscreen();
-      else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
-    } catch { /* Browser may reject fullscreen; inline playback remains available. */ }
   });
   updateVideo();
 })();
