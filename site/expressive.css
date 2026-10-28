@@ -126,3 +126,8 @@ body{background:var(--paper)}
  .hero-title{font-size:65px}.hero-statements{margin-top:26px}
  .hero .role-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
+/* Keep neighboring illustrations outside each cell of the sprite. */
+.scene{background-size:300% 316%}
+.scene-0,.scene-1,.scene-2{background-position-y:0%}
+.scene-3,.scene-4,.scene-5{background-position-y:49%}
+.scene-6,.scene-7,.scene-8{background-position-y:97%}
