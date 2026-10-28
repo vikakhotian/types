@@ -92,6 +92,8 @@
     const avatarEl = $('#dialog-avatar');
     avatarEl.hidden = avatar === null;
     avatarEl.className = 'review-avatar dialog-avatar' + (avatar === null ? '' : ` avatar-${avatar}`);
+    if(avatar===2)avatarEl.classList.add('real-avatar','portrait-alexandra-tursunova');
+    if(avatar===6)avatarEl.classList.add('real-avatar','portrait-alexander-andreev');
     dialogScene.hidden = scene === null;
     dialogScene.className = 'scene dialog-scene' + (scene === null ? '' : ` scene-${scene}`);
     dialog.showModal();
@@ -128,7 +130,7 @@
   const seek = $('#video-seek');
   const time = $('#video-time');
   const mute = $('#video-mute');
-  video.defaultPlaybackRate=1;video.playbackRate=1;video.preservesPitch=true;
+  video.defaultPlaybackRate=1.5;video.playbackRate=1.5;video.preservesPitch=true;
   $('#video-rate').addEventListener('change', e=>{video.playbackRate=Number(e.target.value);});
   const playPath = 'm7 3 15 9-15 9V3Z';
   const pausePath = 'M7 3v18M17 3v18';
@@ -157,10 +159,12 @@
     updateVideo();
   });
   mute.addEventListener('click', () => {
-    video.muted = !video.muted;
-    mute.setAttribute('aria-label', video.muted ? 'Включить звук' : 'Выключить звук');
-    mute.setAttribute('aria-pressed', String(video.muted));
-    mute.style.opacity = video.muted ? '.5' : '1';
+    const panel=$('#video-volume-panel');panel.hidden=!panel.hidden;
+    mute.setAttribute('aria-expanded',String(!panel.hidden));
+  });
+  $('#video-volume').addEventListener('input',e=>{
+    video.volume=Number(e.target.value);video.muted=false;
+    mute.setAttribute('aria-label',`Настроить громкость: ${Math.round(video.volume*100)} процентов`);
   });
   updateVideo();
 })();
