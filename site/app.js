@@ -60,7 +60,13 @@
     const jump=x=>{track.style.scrollSnapType='none';track.scrollTo({left:x,behavior:'instant'});requestAnimationFrame(()=>track.style.scrollSnapType='');};
     const normalize=()=>{if(!cycle)return;let x=track.scrollLeft;if(x<cycle-1)jump(x+cycle);else if(x>=cycle*2-1)jump(x-cycle);};
     const update=()=>{
-      if(dots){const logical=((track.scrollLeft-cycle)/step%count+count)%count;const page=Math.floor((logical+.1)/visible);[...dots.children].forEach((d,i)=>d.setAttribute('aria-current',String(i===page)));}
+      if(dots && step && dots.children.length){
+        // Round to the nearest card, wrap within the original set, then clamp
+        // the page: fractional scrolling near the seam must always select a dot.
+        const card=((Math.round((track.scrollLeft-cycle)/step)%count)+count)%count;
+        const page=Math.min(dots.children.length-1,Math.floor(card/visible));
+        [...dots.children].forEach((d,i)=>d.setAttribute('aria-current',String(i===page)));
+      }
       clearTimeout(timer);timer=setTimeout(normalize,140);
     };
     const resize=()=>{
@@ -94,6 +100,8 @@
     avatarEl.className = 'review-avatar dialog-avatar' + (avatar === null ? '' : ` avatar-${avatar}`);
     if(avatar===2)avatarEl.classList.add('real-avatar','portrait-alexandra-tursunova');
     if(avatar===6)avatarEl.classList.add('real-avatar','portrait-alexander-andreev');
+    const newPortraits={0:'portrait-alina',1:'portrait-zhanna',4:'portrait-mikhail'};
+    if(newPortraits[avatar])avatarEl.classList.add('new-portrait',newPortraits[avatar]);
     dialogScene.hidden = scene === null;
     dialogScene.className = 'scene dialog-scene' + (scene === null ? '' : ` scene-${scene}`);
     dialog.showModal();

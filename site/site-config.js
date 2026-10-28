@@ -1,5 +1,5 @@
 window.SAMANTA_SITE_CONFIG = Object.freeze({
-  homeUrl: 'https://samanta-kody-k-muzhchinam-vika.koalspb.chatgpt.site/',
+  homeUrl: 'https://vikakhotian.github.io/types/',
   contactUrl: 'https://t.me/vikanio',
-  testUrl: 'https://samanta-kody-k-muzhchinam-vika.koalspb.chatgpt.site/test/'
+  testUrl: 'https://vikakhotian.github.io/types/test/'
 });
