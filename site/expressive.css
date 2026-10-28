@@ -186,3 +186,22 @@ body{background:var(--paper)}
 /* A review keeps the same paper and tilt in all three looping copies. */
 .review,.review:nth-child(even){background:#fffef9;transform:rotate(-.5deg)}
 .review[data-review="1"],.review[data-review="3"],.review[data-review="5"],.review[data-review="7"],.review[data-review="9"]{background:#fff5f8;transform:rotate(.6deg)}
+/* The parallel quiz inherits the same ink and interaction palette. */
+.test-page .test-intro h1,.test-page .test-question h2,.test-page .test-result h2,
+.test-page .test-invitation p,.test-page .question-number,.test-page #answered-count,
+.test-page .result-score,.test-page .quiz-alert,.test-page .selection-limit,
+.test-page .question-missing .question-number{color:#593e34}
+.test-page .result-heart{color:#d53d7c}
+.test-page .test-invitation{background:#fff9e9;border-color:#bba081}
+.test-page #answer-progress{background:#eee5d9;color:#b58b47}
+.test-page #answer-progress::-webkit-progress-bar{background:#eee5d9}
+.test-page #answer-progress::-webkit-progress-value{background:#b58b47}
+.test-page #answer-progress::-moz-progress-bar{background:#b58b47}
+.test-page .test-option{border-color:#cbb9a4}
+.test-page .test-option:hover{background:#fff8e8;border-color:#a78a64}
+.test-page .test-option:has(input:checked){background:#fbecf2;border-color:#a88a66;box-shadow:inset 3px 0 0 #a88a66}
+.test-page .test-option:has(input:focus-visible){outline-color:#8b6949}
+.test-page .test-option input{accent-color:#8b6949}
+.test-page .question-missing .question-choices{outline-color:#b68b61}
+.test-page .test-result{border-color:#b99f83;background:#fffef9;border-radius:3px 5px 2px 4px}
+.test-page .question-art{border-radius:0;mask-image:linear-gradient(to right,transparent,#000 3%,#000 97%,transparent),linear-gradient(to bottom,transparent,#000 3%,#000 95%,transparent);mask-composite:intersect}
