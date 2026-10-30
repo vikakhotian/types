@@ -61,3 +61,21 @@
 @media(max-width:760px){.service-main{padding:22px 24px 55px}.service-main h1{font-size:51px}.consultation-intro{grid-template-columns:1fr;gap:27px;padding:25px 0 30px}.service-lead{font-size:16px}.consultation-offer{padding:5px 0 5px 20px}.consultation-offer .offer-price{font-size:54px}.consultation-offer .offer-detail{max-width:430px}.consultation-methods{font-size:15px;line-height:1.9!important;margin:27px 0 39px}.consultation-topics{grid-template-columns:1fr;gap:25px}.consultation-topics h2{font-size:39px}.consultation-list li{margin-bottom:15px;padding-bottom:22px}.consultation-list h3{font-size:30px}.consultation-list p{font-size:15px}.consultation-bottom p{font-size:29px}.consultation-bottom .cta{margin-left:0;margin-right:0}.booking-intro{padding-top:25px}.booking-layout{grid-template-columns:1fr;gap:38px}.booking-aside{border-top:1px dashed #d9c7ad;padding-top:25px}.booking-offer .booking-date{font-size:37px}.booking-next h2{font-size:38px}.booking-actions,.calendar-actions{align-items:flex-start;flex-direction:column;gap:10px}.booking-actions .cta,.calendar-actions .cta{font-size:25px!important}.request-preview{font-size:13px;padding:15px}.bonus-2{display:grid;grid-template-columns:34px minmax(0,1fr)}.bonus-2>.icon{grid-row:1;grid-column:1}.bonus-2>p{grid-row:1;grid-column:2}.bonus-2>.consultation-link{grid-column:1/-1;justify-self:start;margin-top:0}}
 @media(max-width:360px){.service-main{padding-left:19px;padding-right:19px}.service-main h1{font-size:44px}.service-main h2{font-size:36px}.service-back{font-size:23px}.channel-options{gap:10px 14px}.channel-options label{font-size:14px;gap:9px}.booking-actions .cta,.calendar-actions .cta{font-size:23px!important}}
 .booking-page [hidden]{display:none!important}
+/* Формат встречи и запись на консультацию прямо на странице. */
+.consultation-page [hidden]{display:none!important}
+.consultation-extra{font-size:14px;padding:10px 0 16px 17px;border-left:3px solid #e6ce8d;line-height:1.8}
+.consultation-contact{margin-top:40px;border-top:1px solid #d9c7ad;padding-top:35px;scroll-margin-top:25px}
+.consultation-contact>h2{margin:0 0 18px;max-width:850px}
+.consultation-contact>.service-kicker{margin-bottom:13px}
+.consultation-contact>.booking-layout{margin-top:28px}
+.consultation-contact .booking-aside .cta,.booking-aside .cta{font-size:28px!important;line-height:1.2;max-width:100%;margin:5px 0 17px;white-space:normal}
+.booking-tabs{display:flex;gap:15px 34px;margin:8px 0 20px;flex-wrap:wrap}
+.booking-tab{position:relative;border:0;border-radius:0;background:none;color:#795a43;font-family:Caveat,cursive;font-size:32px;line-height:1.2;padding:9px 4px 13px;cursor:pointer;isolation:isolate;min-height:48px}
+.booking-tab:before{content:'';position:absolute;bottom:8px;left:0;right:0;height:10px;z-index:-1;border-radius:23% 11% 33% 8%;background:#f6e3ab;transform:rotate(-1.5deg);opacity:0;transition:opacity .15s}
+.booking-tab[aria-selected=true]{color:#49372f;font-weight:600}
+.booking-tab[aria-selected=true]:before{opacity:1}
+.booking-tab:hover:before{opacity:.6}
+.booking-tab:focus-visible{outline:2px dashed #a18360;outline-offset:4px}
+.booking-tab:disabled{cursor:wait}
+@media(max-width:760px){.consultation-contact{margin-top:25px;padding-top:30px}.consultation-contact h2{font-size:39px}.booking-tabs{gap:12px 22px}.booking-tab{font-size:30px}.consultation-extra{padding-left:13px}}
+@media(max-width:360px){.booking-tab{font-size:28px}.booking-tabs{gap:12px 15px}.consultation-contact h2{font-size:36px}}

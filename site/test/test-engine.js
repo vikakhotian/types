@@ -7,6 +7,7 @@
       throw new RangeError('Неизвестный вариант ответа');
     }
     if (!answers.length) return 0;
+    if (!question.multi && answers.length > 1) throw new RangeError('Выбери один вариант');
     if (question.maxSelect && answers.length > question.maxSelect) throw new RangeError('Слишком много вариантов');
     if (question.onlyChoice !== undefined) return answers.length === 1 && answers[0] === question.onlyChoice ? 2 : 0;
     if (question.maxSelect) return Math.max(...answers.map(i => question.scores[i]));

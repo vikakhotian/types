@@ -6,12 +6,13 @@
   telegramUrl:'https://t.me/vikanio',
   testUrl:base+'test/',
   consultationUrl:base+'consultation/',
-  consultationBookingUrl:base+'booking/?kind=consultation',
+  consultationBookingUrl:base+'consultation/#consultation-contact',
   booking:Object.freeze({
    deliveryMode:'telegram-draft',
    deliveryEndpoint:'',
-   course:Object.freeze({id:'level-1',title:'Саманта: Коды к мужчинам — первый уровень',date:'2026-11-01',startISO:null,durationMinutes:null,timeZone:'Europe/Moscow',price:1800}),
-   consultation:Object.freeze({id:'consultation',title:'Индивидуальная консультация',price:15000,meetings:3})
+   course:Object.freeze({id:'level-1',format:'online',title:'Саманта: Коды к мужчинам — первый уровень',date:'2026-11-01',startISO:null,durationMinutes:null,timeZone:'Europe/Moscow',price:1800}),
+   offline:Object.freeze({id:'level-1-offline',format:'offline',title:'Саманта: Коды к мужчинам — первый уровень, офлайн',date:'2026-11-08',startISO:null,durationMinutes:null,timeZone:'Europe/Moscow',price:3500,location:'Лофт в центре Москвы — предварительная локация',preliminaryDate:true}),
+   consultation:Object.freeze({id:'consultation',title:'Индивидуальная консультация',price:25000,meetings:3})
   })
  });
 })();
