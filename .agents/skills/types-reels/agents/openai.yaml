@@ -1,0 +1,5 @@
+interface:
+  display_name: Ролики
+  short_description: Ведёт от сценария до видео с голосом Вики и субтитрами
+policy:
+  allow_implicit_invocation: true

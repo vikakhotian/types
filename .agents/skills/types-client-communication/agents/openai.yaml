@@ -1,0 +1,5 @@
+interface:
+  display_name: Коммуникации
+  short_description: Готовит сообщения клиенткам и партнёрам проекта
+policy:
+  allow_implicit_invocation: true

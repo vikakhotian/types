@@ -1,0 +1,5 @@
+interface:
+  display_name: Трендвотчинг
+  short_description: Находит темы по публичным сигналам и реальным данным
+policy:
+  allow_implicit_invocation: true

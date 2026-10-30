@@ -1,0 +1,5 @@
+interface:
+  display_name: Проверка фактов
+  short_description: Проверяет источники, утверждения, цитаты и расчёты
+policy:
+  allow_implicit_invocation: true
