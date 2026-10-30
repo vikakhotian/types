@@ -205,3 +205,33 @@ body{background:var(--paper)}
 .test-page .question-missing .question-choices{outline-color:#b68b61}
 .test-page .test-result{border-color:#b99f83;background:#fffef9;border-radius:3px 5px 2px 4px}
 .test-page .question-art{border-radius:0;mask-image:linear-gradient(to right,transparent,#000 3%,#000 97%,transparent),linear-gradient(to bottom,transparent,#000 3%,#000 95%,transparent);mask-composite:intersect}
+
+/* October 30: meaning-led highlights and expandable paper stickers. */
+.recognition-lead{font-weight:700}
+.author-note .bio-mark{display:inline;box-decoration-break:clone;-webkit-box-decoration-break:clone;padding:1px 4px;border-radius:2px;color:#49372f;font-weight:600;background:#f7d5e0}
+.author-note .bio-blue{background:#cde8f0}.author-note .bio-green{background:#cee8d7}.author-note .bio-gold{background:#f8e3a8}
+.fit-column,.fit-column.no{padding-bottom:73px!important;cursor:zoom-in}
+.fit-expand{position:absolute;right:20px;bottom:18px;display:inline-flex;align-items:center;gap:9px;background:none;border:0;color:#795a43;cursor:zoom-in;font-family:Caveat,cursive;font-size:23px;padding:4px}
+.fit-expand .icon{width:18px;height:18px}
+.fit-expand:hover{text-decoration:underline;text-underline-offset:4px}
+.fit-expand:focus-visible{outline:2px dashed #795a43;outline-offset:3px}
+.fit-dialog{width:min(850px,calc(100vw - 30px));max-height:90dvh;overflow:auto;border:1px solid #a38970;border-radius:7px 4px 20px 5px;padding:26px 42px 38px;background:#fce8ef;color:#49372f;box-shadow:5px 6px 0 #b69f8566}
+.fit-dialog.fit-dialog-no{background:#e5f0ed}
+.fit-dialog::backdrop{background:#3e3028b8}
+.fit-dialog h2{font-family:Caveat,cursive;font-size:53px;margin:12px 45px 27px 0;line-height:1.1;color:#593e34}
+.fit-dialog-close{position:sticky;top:0;margin-left:auto;float:right;font-size:28px;line-height:1}
+.fit-dialog-content ul{margin:0;padding:0;list-style:none;display:grid;gap:23px}
+.fit-dialog-content li{display:flex;align-items:flex-start;gap:17px;font-size:19px;line-height:1.75}
+.fit-dialog-content li .icon{width:26px;height:26px;margin-top:4px;flex-shrink:0;color:#795a43}
+.fit-dialog-content strong{font-weight:700}
+.bonus-2 .consultation-link{font-size:25px!important;line-height:1.1;margin-top:15px;display:inline-flex;min-height:58px;padding-bottom:10px!important}
+.bonus-2 .consultation-link:before{right:20px}
+/* The summary arrow starts at the statement and leads to the two methods. */
+.course-summary h2:after{display:none}
+.course-summary{position:relative;gap:95px;align-items:center}
+.course-summary h2{position:relative;margin:0;min-width:0}
+.summary-arrow{position:absolute;width:148px;height:110px;left:calc(100% - 10px);top:calc(100% - 13px);color:#c5829b;pointer-events:none;overflow:visible}
+@media(max-width:980px){.course-summary{gap:84px}.summary-arrow{width:110px;height:82px;left:44%;top:calc(100% - 2px);transform:rotate(64deg)}}
+@media(max-width:760px){.fit-dialog{padding:18px 24px 30px}.fit-dialog h2{font-size:43px;margin-top:14px}.fit-dialog-content li{font-size:16px;gap:12px}.fit-dialog-content li .icon{width:23px;height:23px}.summary-arrow{left:45%;width:102px;height:77px;top:100%;transform:rotate(64deg)}.course-summary{gap:87px}.bonus-2 .consultation-link{font-size:27px!important}}
+.course-summary>.summary-arrow{position:absolute;inset:0;left:0;top:0;width:100%;height:100%;transform:none;overflow:visible}
+@media(max-width:760px){.bonus-2{display:grid;grid-template-columns:34px minmax(0,1fr)}.bonus-2>.icon{grid-row:1;grid-column:1}.bonus-2>p{grid-row:1;grid-column:2}.bonus-2>.consultation-link{grid-column:1/-1;justify-self:start;margin-top:0}}

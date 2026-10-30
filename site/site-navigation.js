@@ -8,6 +8,8 @@
  bind('[data-site-home]', config.homeUrl);
  bind('[data-site-contact]', config.contactUrl);
  bind('[data-site-test]', config.testUrl);
+ bind('[data-site-consultation]',config.consultationUrl);
+ bind('[data-booking-consultation]',config.consultationBookingUrl);
  document.addEventListener('click', e => {
   const el=e.target.closest('.cta,[data-site-contact],[data-site-home]');
   if (!el) return;

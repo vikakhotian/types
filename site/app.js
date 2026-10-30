@@ -179,7 +179,10 @@
   const seek = $('#video-seek');
   const time = $('#video-time');
   const mute = $('#video-mute');
+  // Сам файл уже ускорен на 1.1x; множитель плеера считается от этой базы.
   video.defaultPlaybackRate=1.5;video.playbackRate=1.5;video.preservesPitch=true;
+  video.volume=0.5;video.muted=false;
+  mute.setAttribute("aria-label","Настроить громкость: 50 процентов");
   $('#video-rate').addEventListener('change', e=>{video.playbackRate=Number(e.target.value);});
   const playPath = 'm7 3 15 9-15 9V3Z';
   const pausePath = 'M7 3v18M17 3v18';
