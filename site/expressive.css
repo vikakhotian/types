@@ -237,5 +237,7 @@ body{background:var(--paper)}
 @media(max-width:760px){.bonus-2{display:grid;grid-template-columns:34px minmax(0,1fr)}.bonus-2>.icon{grid-row:1;grid-column:1}.bonus-2>p{grid-row:1;grid-column:2}.bonus-2>.consultation-link{grid-column:1/-1;justify-self:start;margin-top:0}}
 
 /* Портреты по присланным фотографиям: порядок Наталья, Татьяна, Роман, Мария, Станислав. */
-.latest-portrait{background-image:url('assets/review-portraits-03.webp')!important;background-size:500% auto!important}
+.latest-portrait{background-image:url('assets/review-portraits-03.webp?v=11')!important;background-size:500% auto!important}
 .portrait-natalia{background-position:0% 50%!important}.portrait-tatyana-mironova{background-position:25% 50%!important}.portrait-roman{background-position:50% 50%!important}.portrait-maria{background-position:75% 50%!important}.portrait-stanislav{background-position:100% 50%!important}
+
+.portrait-tatyana-urda{background-image:url('assets/review-tatyana-urda.webp')!important;background-size:160% auto!important;background-position:50% 30%!important}

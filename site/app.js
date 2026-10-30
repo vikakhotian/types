@@ -139,6 +139,7 @@
     const avatarEl = $('#dialog-avatar');
     avatarEl.hidden = avatar === null;
     avatarEl.className = 'review-avatar dialog-avatar' + (avatar === null ? '' : ` avatar-${avatar}`);
+    if(avatar===3)avatarEl.classList.add('portrait-tatyana-urda');
     if(avatar===2)avatarEl.classList.add('real-avatar','portrait-alexandra-tursunova');
     if(avatar===6)avatarEl.classList.add('real-avatar','portrait-alexander-andreev');
     const newPortraits={0:'portrait-alina',1:'portrait-zhanna',4:'portrait-mikhail'};
