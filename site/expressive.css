@@ -235,3 +235,7 @@ body{background:var(--paper)}
 @media(max-width:760px){.fit-dialog{padding:18px 24px 30px}.fit-dialog h2{font-size:43px;margin-top:14px}.fit-dialog-content li{font-size:16px;gap:12px}.fit-dialog-content li .icon{width:23px;height:23px}.summary-arrow{left:45%;width:102px;height:77px;top:100%;transform:rotate(64deg)}.course-summary{gap:87px}.bonus-2 .consultation-link{font-size:27px!important}}
 .course-summary>.summary-arrow{position:absolute;inset:0;left:0;top:0;width:100%;height:100%;transform:none;overflow:visible}
 @media(max-width:760px){.bonus-2{display:grid;grid-template-columns:34px minmax(0,1fr)}.bonus-2>.icon{grid-row:1;grid-column:1}.bonus-2>p{grid-row:1;grid-column:2}.bonus-2>.consultation-link{grid-column:1/-1;justify-self:start;margin-top:0}}
+
+/* Портреты по присланным фотографиям: порядок Наталья, Татьяна, Роман, Мария, Станислав. */
+.latest-portrait{background-image:url('assets/review-portraits-03.webp')!important;background-size:500% auto!important}
+.portrait-natalia{background-position:0% 50%!important}.portrait-tatyana-mironova{background-position:25% 50%!important}.portrait-roman{background-position:50% 50%!important}.portrait-maria{background-position:75% 50%!important}.portrait-stanislav{background-position:100% 50%!important}

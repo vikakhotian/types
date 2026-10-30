@@ -143,6 +143,8 @@
     if(avatar===6)avatarEl.classList.add('real-avatar','portrait-alexander-andreev');
     const newPortraits={0:'portrait-alina',1:'portrait-zhanna',4:'portrait-mikhail'};
     if(newPortraits[avatar])avatarEl.classList.add('new-portrait',newPortraits[avatar]);
+    const latestPortraits={5:'portrait-natalia',7:'portrait-tatyana-mironova',8:'portrait-roman',9:'portrait-maria',10:'portrait-stanislav'};
+    if(latestPortraits[avatar])avatarEl.classList.add('latest-portrait',latestPortraits[avatar]);
     dialogScene.hidden = scene === null;
     dialogScene.className = 'scene dialog-scene' + (scene === null ? '' : ` scene-${scene}`);
     dialog.showModal();
