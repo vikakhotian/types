@@ -81,7 +81,7 @@
  const clean = (key, value) => {
   let v = value.trim();
   if (key === 'telegram') v = v.replace(/^https?:\/\/(?:www\.)?t\.me\//i, '').replace(/\/$/, '');
-  if (key === 'vk') v = v.replace(/^https?:\/\/(?:www\.)?vk\.com\//i, '').replace(/\/$/, '');
+  if (key === 'vk') v = v.replace(/^https?:\/\/(?:www\.)?vk\.(?:com|ru)\//i, '').replace(/\/$/, '');
   return v;
  };
  const validate = () => {

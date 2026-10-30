@@ -10,6 +10,7 @@
  bind('[data-site-test]', config.testUrl);
  bind('[data-site-consultation]',config.consultationUrl);
  bind('[data-booking-consultation]',config.consultationBookingUrl);
+ document.querySelectorAll('[data-direct-social]').forEach(el=>{const url=config.socials?.[el.dataset.directSocial];if(url)el.href=url;});
  document.addEventListener('click', e => {
   const el=e.target.closest('.cta,[data-site-contact],[data-site-home]');
   if (!el) return;

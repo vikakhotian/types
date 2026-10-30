@@ -4,6 +4,7 @@
   homeUrl:base,
   contactUrl:base+'booking/',
   telegramUrl:'https://t.me/vikanio',
+  socials:Object.freeze({telegram:'https://t.me/vikanio',whatsapp:'https://wa.me/79162501475',vk:'https://vk.ru/vikanio',email:'mailto:vhotyan@gmail.com'}),
   testUrl:base+'test/',
   consultationUrl:base+'consultation/',
   consultationBookingUrl:base+'consultation/#consultation-contact',

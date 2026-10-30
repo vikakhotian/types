@@ -79,3 +79,16 @@
 .booking-tab:disabled{cursor:wait}
 @media(max-width:760px){.consultation-contact{margin-top:25px;padding-top:30px}.consultation-contact h2{font-size:39px}.booking-tabs{gap:12px 22px}.booking-tab{font-size:30px}.consultation-extra{padding-left:13px}}
 @media(max-width:360px){.booking-tab{font-size:28px}.booking-tabs{gap:12px 15px}.consultation-contact h2{font-size:36px}}
+
+.contact-channel-icon{width:27px;height:27px;flex:0 0 27px;padding:3px;border-radius:41% 32% 38% 27%;transform:rotate(-4deg)}
+.channel-vk{color:#3b6f86;background:#e2f0f4}.channel-telegram{color:#357b94;background:#e0f0f6;transform:rotate(4deg)}.channel-whatsapp{color:#4c7a63;background:#e0eee2}.channel-email{color:#9b7745;background:#f8eac6;transform:rotate(3deg)}
+.direct-contact-icon{width:30px;height:30px;flex:0 0 30px;color:#357b94}
+.channel-options label{gap:9px}
+@media(max-width:390px){.channel-options{gap:10px 7px}.channel-options label{gap:7px;font-size:14px}.contact-channel-icon{width:24px;height:24px;flex-basis:24px}.channel-options input{width:18px;height:18px;flex-shrink:0}}
+
+.direct-contacts{display:flex;flex-wrap:wrap;gap:8px 22px;margin:15px 0 20px}
+.direct-social{display:inline-flex;align-items:center;gap:9px;min-height:46px;max-width:100%;padding:6px 0;font-family:Neucha,cursive;font-size:23px;line-height:1.3;color:#795a43;text-decoration:underline;text-decoration-color:#e4c7c2;text-underline-offset:6px;text-decoration-thickness:1px}
+.direct-social:hover{text-decoration-color:#795a43}.direct-social:focus-visible{outline:2px dashed #a18360;outline-offset:4px}
+.direct-social .direct-contact-icon{width:28px;height:28px;flex-basis:28px}
+.direct-social .channel-whatsapp{color:#4c7a63}.direct-social .channel-vk{color:#3b6f86}.direct-social .channel-email{color:#9b7745}
+@media(max-width:360px){.channel-options label{font-size:13px}.direct-contacts{gap:8px 19px}.direct-social{font-size:22px}}
