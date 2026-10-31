@@ -1,0 +1,57 @@
+name: Manual CRM smoke test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  submit-and-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit one lead, retry it, and reject a bot payload
+        env:
+          CRM_ENDPOINT: https://script.google.com/macros/s/AKfycbzELuPL_Nj17w-D8WHDbYXkZ8237MKYtE2HjYHDZEymgr_16Dfw_B3rpS3WMijMSpUj4w/exec
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.parse, urllib.request
+
+          endpoint = os.environ['CRM_ENDPOINT']
+          request_id = 'github-smoke-' + os.environ['RUN_ID']
+          lead = {
+              'requestId': request_id,
+              'name': 'ТЕСТ CRM И ПОЧТЫ — УДАЛИТЬ',
+              'product': 'consultation',
+              'date': 'консультация',
+              'website': '',
+              'contacts': {'email': 'vhotyan@gmail.com'},
+          }
+
+          def submit(payload):
+              body = urllib.parse.urlencode({
+                  'payload': json.dumps(payload, ensure_ascii=False)
+              }).encode()
+              request = urllib.request.Request(
+                  endpoint,
+                  data=body,
+                  headers={
+                      'Content-Type': 'application/x-www-form-urlencoded',
+                      'Origin': 'https://vikakhotian.github.io',
+                  },
+              )
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  result = response.read().decode('utf-8')
+              print(result)
+              return result
+
+          first = submit(lead)
+          duplicate = submit(lead)
+          bot = dict(lead, requestId=request_id + '-bot', website='filled')
+          rejected = submit(bot)
+
+          assert '"ok":true' in first
+          assert '"ok":true' in duplicate
+          assert '"ok":false' in rejected and 'invalid_request' in rejected
+          PY

@@ -353,3 +353,55 @@ body{background:var(--paper)}
  .methods-list li:before{left:11px}
  .methods-list li:after{right:13px;width:25px}
 }
+
+/* Version 21: separate hand-drawn book doodles, lighter and closer to the wrapper illustrations. */
+.methods-list{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:24px 42px;
+ max-width:1050px;
+ padding:12px 14px 34px;
+}
+.methods-list li,
+.methods-list li:nth-child(n){
+ display:grid;
+ grid-column:auto;
+ grid-template-columns:74px minmax(0,1fr);
+ align-items:center;
+ width:auto;
+ min-height:86px;
+ margin:0!important;
+ padding:8px 4px 13px;
+ color:#49372f;
+ background:transparent;
+ border:0;
+ border-bottom:1px dashed rgba(140,106,80,.42);
+ border-radius:0;
+ clip-path:none;
+ box-shadow:none;
+ font-size:16px;
+ line-height:1.65;
+ transform:none;
+}
+.methods-list li>span{min-width:0}
+.methods-list li:nth-child(2),.methods-list li:nth-child(4){transform:translateY(13px)}
+.methods-list li:nth-child(5){grid-column:1/-1;width:70%;justify-self:center;transform:rotate(-.35deg)}
+.methods-list li:before{
+ display:block!important;
+ content:''!important;
+ position:static;
+ width:64px;
+ height:52px;
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 76 58' fill='none' stroke='%238c6a50' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M38 13C30 7 19 5 7 8v37c11-3 22-1 31 6 9-7 20-9 31-6V8c-12-3-23-1-31 5Z' stroke-width='1.8'/%3E%3Cpath d='M38 13v38M11 13c8-2 16 0 23 4M42 17c7-4 15-6 23-4M11 39c8-2 16 0 23 5M42 44c7-5 15-7 23-5' stroke-width='1.25' opacity='.72'/%3E%3Cpath d='M5 12 2 14v36c12-2 24 0 36 6 12-6 24-8 36-6V14l-3-2' stroke-width='1.1' opacity='.55'/%3E%3C/svg%3E") center/contain no-repeat;
+ border:0;
+ transform:rotate(-4deg);
+}
+.methods-list li:nth-child(even):before{transform:rotate(4deg)}
+.methods-list li:nth-child(3):before{transform:rotate(1deg)}
+.methods-list li:after{display:none;content:none}
+@media(max-width:760px){
+ .methods-list{display:grid;grid-template-columns:1fr;gap:13px;padding:4px 2px 28px}
+ .methods-list li,.methods-list li:nth-child(n){grid-column:auto;width:100%;min-height:78px;margin:0!important;padding:7px 0 11px;grid-template-columns:62px minmax(0,1fr);font-size:15px;line-height:1.58;transform:none}
+ .methods-list li:nth-child(5){justify-self:stretch}
+ .methods-list li:before{width:54px;height:46px}
+}
