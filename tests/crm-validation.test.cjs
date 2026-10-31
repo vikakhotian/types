@@ -13,7 +13,7 @@ test('Ошибочные даты, пустые контакты, неизвес
  for(const patch of [{date:'2026-02-30'},{date:'bad'},{contacts:{}},{contacts:{other:'bad'}},{website:'spam'},{contacts:{email:'bad'}},{name:'A'},{requestId:'x'}])assert.throws(()=>c.validateBooking({...base(),...patch}));
 });
 test('Переименование и перестановка столбцов не меняет смысл записи',()=>{
- const columns={name:8,lead_source:3,channels:6,links:2,event_date:10};
+ const columns={name:8,lead_source:3,channels:6,links:2,registered_at:7,event_date:10};
  c.PropertiesService={getScriptProperties:()=>({getProperty:key=>key==='CRM_SHEET_ID'?'42':'private-id'})};
  c.SpreadsheetApp={openById:()=>({getSheetById:()=>({getSheetId:()=>42}),createDeveloperMetadataFinder:()=>({withKey(){return this;},find:()=>Object.entries(columns).map(([field,col])=>({getValue:()=>field,getLocation:()=>({getColumn:()=>({getSheet:()=>({getSheetId:()=>42}),getColumn:()=>col})})}))})})};
  assert.deepEqual(JSON.parse(JSON.stringify(c.getCRM().columns)),columns);

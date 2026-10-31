@@ -97,3 +97,5 @@
 .booking-honeypot{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
 #booking-submit[aria-busy=true]{opacity:.6;cursor:wait}
 @media(max-width:760px){.booking-aside{padding-top:22px!important}}
+
+.booking-choice-intro{margin:25px 0 5px}.booking-choice-intro .form-field{max-width:480px;margin:0 auto}.booking-choice-intro label{font-family:Neucha,cursive;font-size:23px}.contact-branches{display:block;width:100%;height:80px;color:#bf8ca5}.booking-layout{margin-top:0}.booking-aside{padding-top:0!important}.contact-methods legend,.service-main .booking-aside h2{font-family:Neucha,cursive;font-size:25px;font-weight:400;line-height:1.3}.contact-methods legend{padding:0}.direct-social{font-size:23px}@media(max-width:760px){.contact-branches{height:58px}.booking-aside{padding-top:23px!important}}

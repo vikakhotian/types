@@ -1,5 +1,5 @@
 /* Приемник заявок Саманты. Таблица остается закрытой. URL CRM не возвращается посетителям. */
-const CRM_FIELDS = ['name', 'lead_source', 'channels', 'links', 'event_date'];
+const CRM_FIELDS = ['name', 'lead_source', 'channels', 'links', 'registered_at', 'event_date'];
 const CRM_LABELS = {vk:'ВКонтакте', telegram:'Телеграм', whatsapp:'WhatsApp', email:'email'};
 
 function doGet() {
@@ -105,6 +105,7 @@ function saveLead(lead) {
   lead.links.forEach(url => { rich.setLinkUrl(offset,offset+url.length,url); offset += url.length+1; });
   sheet.getRange(row,col.links).setRichTextValue(rich.build()).setWrap(true);
   sheet.getRange(row,col.channels).setWrap(true);
+  sheet.getRange(row,col.registered_at).setValue(new Date()).setNumberFormat('dd.mm.yyyy');
   if (lead.date) sheet.getRange(row,col.event_date).setValue(Utilities.parseDate(lead.date+' 12:00','Europe/Moscow','yyyy-MM-dd HH:mm')).setNumberFormat('dd.mm.yyyy');
   SpreadsheetApp.flush();
   // Readback before acknowledgement. Failure never produces a success confirmation.

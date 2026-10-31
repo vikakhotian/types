@@ -79,16 +79,12 @@
   const payload=collect();if(!payload)return;
   requestId=requestId||(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Array.from(crypto.getRandomValues(new Uint32Array(4))).join('-'));
   payload.requestId=requestId;sending=true;submit.disabled=true;submit.setAttribute('aria-busy','true');
-  const controls=[...form.querySelectorAll('input:not(:disabled)')];controls.forEach(input=>input.disabled=true);tabs.forEach(tab=>tab.disabled=true);
+  const controls=[...form.querySelectorAll('input:not(:disabled)'),$('#booking-name')];controls.forEach(input=>input.disabled=true);tabs.forEach(tab=>tab.disabled=true);
   try{
    await sendToCRM(payload);submitted=true;status.textContent='Заявка отправлена';
   }catch(e){error.textContent=e.message==='not-connected'?'Форма пока недоступна. Напиши мне напрямую справа.':'Не получилось подтвердить отправку. Попробуй еще раз или напиши мне напрямую.';}
   finally{sending=false;controls.forEach(input=>input.disabled=false);tabs.forEach(tab=>tab.disabled=false);submit.disabled=submitted;submit.removeAttribute('aria-busy');}
  });
- const alignContacts=()=>{
-  const aside=$('.booking-aside'),legend=form.querySelector('.contact-methods legend'),layout=$('.booking-layout');if(!aside||!legend)return;
-  aside.style.paddingTop=innerWidth>760?Math.max(0,legend.getBoundingClientRect().top-layout.getBoundingClientRect().top)+'px':'';
- };
- new ResizeObserver(alignContacts).observe(form.querySelector('.form-field'));addEventListener('resize',alignContacts);document.fonts.ready.then(alignContacts);alignContacts();
+ $('#booking-name').addEventListener('input',markEdited);
  submit.disabled=false;
 })();

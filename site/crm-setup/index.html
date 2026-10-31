@@ -1,0 +1,127 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Подключение CRM</title><style>body{font:18px/1.7 system-ui;max-width:850px;margin:40px auto;padding:20px;background:#fffdf8;color:#593e34}button{font:inherit;padding:12px 25px;cursor:pointer}textarea{display:block;width:100%;height:300px;margin-top:25px;font:13px/1.5 monospace}</style><h1>Код для твоей CRM</h1><p>Нажми «Скопировать код». В редакторе Apps Script кликни по коду, нажми Ctrl+A, затем Ctrl+V и сохрани Ctrl+S. Текст <code>function myFunction()</code> и путь к файлу нужно заменить целиком.</p><button id="copy">Скопировать код</button><p id="status" role="status"></p><textarea id="code" readonly aria-label="Полный код Apps Script">/* Приемник заявок Саманты. Таблица остается закрытой. URL CRM не возвращается посетителям. */
+const CRM_FIELDS = [&#x27;name&#x27;, &#x27;lead_source&#x27;, &#x27;channels&#x27;, &#x27;links&#x27;, &#x27;registered_at&#x27;, &#x27;event_date&#x27;];
+const CRM_LABELS = {vk:&#x27;ВКонтакте&#x27;, telegram:&#x27;Телеграм&#x27;, whatsapp:&#x27;WhatsApp&#x27;, email:&#x27;email&#x27;};
+
+function doGet() {
+  return ContentService.createTextOutput(&#x27;Samantha booking receiver&#x27;).setMimeType(ContentService.MimeType.TEXT);
+}
+function doPost(e) {
+  let request = {}, result;
+  try {
+    const raw = e &amp;&amp; e.parameter &amp;&amp; e.parameter.payload;
+    if (!raw || raw.length &gt; 8000) throw new Error(&#x27;invalid_request&#x27;);
+    request = JSON.parse(raw);
+    const lead = validateBooking(request);
+    const lock = LockService.getScriptLock();
+    if (!lock.tryLock(20000)) throw new Error(&#x27;busy&#x27;);
+    try {
+      const cache = CacheService.getScriptCache(), key = &#x27;booking:&#x27; + request.requestId;
+      if (!cache.get(key)) {
+        saveLead(lead);
+        cache.put(key, &#x27;saved&#x27;, 21600);
+      }
+      result = {ok:true};
+    } finally { lock.releaseLock(); }
+  } catch (error) {
+    const allowed = [&#x27;invalid_request&#x27;,&#x27;invalid_name&#x27;,&#x27;invalid_contacts&#x27;,&#x27;invalid_date&#x27;,&#x27;busy&#x27;];
+    result = {ok:false, code:allowed.indexOf(error.message) &gt;= 0 ? error.message : &#x27;crm_unavailable&#x27;};
+  }
+  // HTML + postMessage gives an acknowledged result without CORS-dependent fetch or a no-cors false success.
+  const config = PropertiesService.getScriptProperties();
+  const origin = config.getProperty(&#x27;SITE_ORIGIN&#x27;) || &#x27;https://vikakhotian.github.io&#x27;;
+  const id = typeof request.requestId === &#x27;string&#x27; &amp;&amp; /^[a-zA-Z0-9-]{16,80}$/.test(request.requestId) ? request.requestId : &#x27;&#x27;;
+  const message = JSON.stringify({type:&#x27;samanta:booking&#x27;, requestId:id, ok:result.ok, code:result.code || &#x27;&#x27;}).replace(/&lt;/g,&#x27;\\u003c&#x27;);
+  const html = &#x27;&lt;!doctype html&gt;&lt;meta charset=&quot;utf-8&quot;&gt;&lt;script&gt;window.top.postMessage(&#x27; + message + &#x27;,&#x27; + JSON.stringify(origin) + &#x27;);&lt;/script&gt;&#x27;;
+  return HtmlService.createHtmlOutput(html).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+function validateBooking(r) {
+  if (!r || !/^[a-zA-Z0-9-]{16,80}$/.test(r.requestId || &#x27;&#x27;) || r.website) throw new Error(&#x27;invalid_request&#x27;);
+  const name = typeof r.name === &#x27;string&#x27; ? r.name.trim() : &#x27;&#x27;;
+  if (name.length &lt; 2 || name.length &gt; 80 || /[\u0000-\u001f]/.test(name)) throw new Error(&#x27;invalid_name&#x27;);
+  if (![&#x27;level-1&#x27;,&#x27;level-1-offline&#x27;,&#x27;consultation&#x27;].includes(r.product)) throw new Error(&#x27;invalid_request&#x27;);
+  const contacts = r.contacts;
+  if (!contacts || typeof contacts !== &#x27;object&#x27; || Array.isArray(contacts)) throw new Error(&#x27;invalid_contacts&#x27;);
+  const keys = Object.keys(contacts);
+  if (!keys.length || keys.length &gt; 4 || keys.some(k =&gt; !CRM_LABELS[k])) throw new Error(&#x27;invalid_contacts&#x27;);
+  const links = [], labels = [];
+  keys.forEach(key =&gt; {
+    const value = String(contacts[key]).trim(); let url;
+    if (key === &#x27;telegram&#x27;) {
+      const username = value.replace(/^https?:\/\/(?:www\.)?t\.me\//i,&#x27;&#x27;).replace(/^@/,&#x27;&#x27;).replace(/\/$/,&#x27;&#x27;);
+      if (!/^[a-zA-Z0-9_]{3,32}$/.test(username)) throw new Error(&#x27;invalid_contacts&#x27;);
+      url = &#x27;https://t.me/&#x27; + username;
+    } else if (key === &#x27;vk&#x27;) {
+      const id = value.replace(/^https?:\/\/(?:www\.)?vk\.(?:com|ru)\//i,&#x27;&#x27;).replace(/\/$/,&#x27;&#x27;);
+      if (!/^[a-zA-Z0-9_.-]{2,80}$/.test(id)) throw new Error(&#x27;invalid_contacts&#x27;);
+      url = &#x27;https://vk.ru/&#x27; + id;
+    } else if (key === &#x27;whatsapp&#x27;) {
+      let phone = value.replace(/\D/g,&#x27;&#x27;);
+      if (phone.length === 11 &amp;&amp; phone[0] === &#x27;8&#x27;) phone = &#x27;7&#x27; + phone.slice(1);
+      if (phone.length === 10 &amp;&amp; phone[0] === &#x27;9&#x27;) phone = &#x27;7&#x27; + phone;
+      if (!/^\d{8,15}$/.test(phone)) throw new Error(&#x27;invalid_contacts&#x27;);
+      url = &#x27;https://wa.me/&#x27; + phone;
+    } else {
+      if (value.length &gt; 160 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) throw new Error(&#x27;invalid_contacts&#x27;);
+      url = &#x27;mailto:&#x27; + value;
+    }
+    labels.push(CRM_LABELS[key]); links.push(url);
+  });
+  let date = &#x27;&#x27;;
+  if (r.product !== &#x27;consultation&#x27;) {
+    date = r.date;
+    if (typeof date !== &#x27;string&#x27; || !/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error(&#x27;invalid_date&#x27;);
+    const parsed = new Date(date + &#x27;T12:00:00Z&#x27;);
+    if (!isFinite(+parsed) || parsed.toISOString().slice(0,10) !== date || +date.slice(0,4) &lt; 2026 || +date.slice(0,4) &gt; 2100) throw new Error(&#x27;invalid_date&#x27;);
+  }
+  return {name:name, labels:labels, links:links, date:date};
+}
+function getCRM() {
+  const props = PropertiesService.getScriptProperties();
+  const book = SpreadsheetApp.openById(props.getProperty(&#x27;SPREADSHEET_ID&#x27;));
+  const sheet = book.getSheetById(Number(props.getProperty(&#x27;CRM_SHEET_ID&#x27;)));
+  if (!sheet) throw new Error(&#x27;crm_unavailable&#x27;);
+  const columns = {};
+  book.createDeveloperMetadataFinder().withKey(&#x27;SAMANTA_CRM_FIELD&#x27;).find().forEach(item =&gt; {
+    const col = item.getLocation().getColumn();
+    if (col &amp;&amp; col.getSheet().getSheetId() === sheet.getSheetId()) {
+      const field = item.getValue();
+      if (columns[field]) throw new Error(&#x27;crm_unavailable&#x27;);
+      columns[field] = col.getColumn();
+    }
+  });
+  if (CRM_FIELDS.some(field =&gt; !columns[field])) throw new Error(&#x27;crm_unavailable&#x27;);
+  return {book:book,sheet:sheet,columns:columns};
+}
+function saveLead(lead) {
+  const crm = getCRM(), sheet = crm.sheet, col = crm.columns;
+  const row = sheet.getLastRow() + 1;
+  if (row &gt; sheet.getMaxRows()) sheet.insertRowsAfter(sheet.getMaxRows(), 100);
+  // Formatting only: never copy another client&#x27;s values, links, notes or formulas.
+  if (row &gt; 2) sheet.getRange(row-1,1,1,sheet.getLastColumn()).copyTo(sheet.getRange(row,1,1,sheet.getLastColumn()),SpreadsheetApp.CopyPasteType.PASTE_FORMAT,false);
+  const plain = (field,text) =&gt; sheet.getRange(row,col[field]).setRichTextValue(SpreadsheetApp.newRichTextValue().setText(text).build());
+  plain(&#x27;name&#x27;,lead.name); plain(&#x27;lead_source&#x27;,&#x27;сайт&#x27;); plain(&#x27;channels&#x27;,lead.labels.join(&#x27;\n&#x27;));
+  const joined = lead.links.join(&#x27;\n&#x27;), rich = SpreadsheetApp.newRichTextValue().setText(joined);
+  let offset = 0;
+  lead.links.forEach(url =&gt; { rich.setLinkUrl(offset,offset+url.length,url); offset += url.length+1; });
+  sheet.getRange(row,col.links).setRichTextValue(rich.build()).setWrap(true);
+  sheet.getRange(row,col.channels).setWrap(true);
+  sheet.getRange(row,col.registered_at).setValue(new Date()).setNumberFormat(&#x27;dd.mm.yyyy&#x27;);
+  if (lead.date) sheet.getRange(row,col.event_date).setValue(Utilities.parseDate(lead.date+&#x27; 12:00&#x27;,&#x27;Europe/Moscow&#x27;,&#x27;yyyy-MM-dd HH:mm&#x27;)).setNumberFormat(&#x27;dd.mm.yyyy&#x27;);
+  SpreadsheetApp.flush();
+  // Readback before acknowledgement. Failure never produces a success confirmation.
+  if (sheet.getRange(row,col.name).getDisplayValue() !== lead.name || sheet.getRange(row,col.lead_source).getDisplayValue() !== &#x27;сайт&#x27; || sheet.getRange(row,col.links).getDisplayValue() !== joined) throw new Error(&#x27;crm_unavailable&#x27;);
+}
+function checkConnection() {
+  const crm = getCRM();
+  console.log(&#x27;CRM подключена. Поля: &#x27; + CRM_FIELDS.join(&#x27;, &#x27;));
+  return true;
+}
+function setupConnection() {
+ const book = SpreadsheetApp.getActiveSpreadsheet();
+ if (!book) throw new Error(&#x27;Открой редактор из своей Google-таблицы через Расширения → Apps Script&#x27;);
+ const sheet = book.getSheetByName(&#x27;CRM&#x27;);
+ if (!sheet) throw new Error(&#x27;В этой таблице нет вкладки CRM&#x27;);
+ PropertiesService.getScriptProperties().setProperties({SPREADSHEET_ID:book.getId(),CRM_SHEET_ID:String(sheet.getSheetId()),SITE_ORIGIN:&#x27;https://vikakhotian.github.io&#x27;});
+ return checkConnection();
+}
+</textarea><script>document.querySelector('#copy').onclick=async()=>{const e=document.querySelector('#code');try{await navigator.clipboard.writeText(e.value);document.querySelector('#status').textContent='Код скопирован. Теперь вставь его вместо всего содержимого Code.gs.';}catch{e.select();document.querySelector('#status').textContent='Код выделен. Нажми Ctrl+C, затем вставь в Code.gs.';}};</script></html>
