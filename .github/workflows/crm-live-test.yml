@@ -9,6 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Send valid, duplicate and invalid CRM requests
         env:
           CRM_ENDPOINT: https://script.google.com/macros/s/AKfycbzELuPL_Nj17w-D8WHDbYXkZ8237MKYtE2HjYHDZEymgr_16Dfw_B3rpS3WMijMSpUj4w/exec
@@ -56,3 +57,32 @@ jobs:
           send(dict(base, requestId='crm-invalid-bot-20261031', product='level-1', date='2026-11-01',
                     name='ТЕСТ Бот', contacts={'telegram':'@crm_invalid_bot'}, website='spam'), False, 'invalid_request')
           PY
+      - name: Install browser driver
+        run: npm install --no-save playwright-core
+      - name: Submit all three public website forms
+        run: |
+          node - <<'NODE'
+          const {chromium}=require('playwright-core');
+          const base='https://vikakhotian.github.io/types/';
+          const run=async(browser,{path,name,channel,value,offline=false,success})=>{
+            const page=await browser.newPage({viewport:{width:390,height:844}});
+            await page.goto(base+path+'?crm-live-ui=20261031',{waitUntil:'networkidle'});
+            if(offline)await page.locator('#format-offline').click();
+            await page.locator('#booking-name').fill(name);
+            await page.locator(`[name=channel][value=${channel}]`).check();
+            await page.locator(`#contact-${channel}`).fill(value);
+            await page.locator('#booking-submit').click();
+            await page.locator('#booking-status').getByText(success,{exact:true}).waitFor({timeout:60000});
+            console.log(name,'confirmed by website');
+            await page.close();
+          };
+          (async()=>{
+            const browser=await chromium.launch({headless:true,executablePath:'/usr/bin/google-chrome',args:['--no-sandbox']});
+            await Promise.all([
+              run(browser,{path:'booking/',name:'ТЕСТ UI Онлайн',channel:'telegram',value:'@crm_ui_online',success:'Записано! Скоро пришлем ссылку на занятие и данные для оплаты.'}),
+              run(browser,{path:'booking/',name:'ТЕСТ UI Офлайн',channel:'vk',value:'crm_ui_offline',offline:true,success:'Записано! Скоро пришлем ссылку на занятие и данные для оплаты.'}),
+              run(browser,{path:'consultation/',name:'ТЕСТ UI Консультация',channel:'email',value:'crm.ui.consult@example.com',success:'Записано! Скоро свяжемся с тобой.'})
+            ]);
+            await browser.close();
+          })().catch(error=>{console.error(error);process.exit(1)});
+          NODE
