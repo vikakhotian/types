@@ -118,7 +118,7 @@
     const points = questions.map((q, i) => score(q, answers[i]));
     const result = results[resultIndex(points)];
     $('#result-title').textContent = result.title;
-    $('#result-score').textContent = `${points.reduce((sum, n) => sum + n, 0)} из 24 баллов`;
+    $('#result-score').textContent = `${points.reduce((sum, n) => sum + n, 0)} из 26 баллов`;
     $('#result-text').replaceChildren(...result.text.split('\n\n').map(text => {
       const paragraph = document.createElement('p');
       paragraph.textContent = text;
