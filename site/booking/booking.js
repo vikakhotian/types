@@ -6,8 +6,10 @@
  const consultation=!!document.querySelector('[data-booking-kind="consultation"]')||params.get('kind')==='consultation';
  const tabs=[...document.querySelectorAll('[data-booking-format]')],choices=[...form.querySelectorAll('[name=channel]')];
  const error=$('#booking-error'),status=$('#booking-status'),submit=$('#booking-submit');
+ const confirm=document.createElement('p');confirm.id='booking-confirm';confirm.className='booking-confirm';confirm.setAttribute('role','alert');confirm.hidden=true;error.before(confirm);
+ const submitLabel=submit.childNodes[0];
  let format=params.get('format')==='offline'?'offline':'online',product=consultation?settings.consultation:format==='offline'?settings.offline:settings.course;
- let sending=false,requestId=null,submitted=false;
+ let sending=false,requestId=null,submitted=false,confirming=false;
  const money=n=>new Intl.NumberFormat('ru-RU').format(n)+' ₽';
  const dateText=date=>new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric',timeZone:'Europe/Moscow'}).format(new Date(date+'T12:00:00Z')).replace(/ г\.$/,'');
  const updateDirect=()=>{
@@ -15,7 +17,7 @@
   target.searchParams.set('text',consultation?'Вика, привет! Хочу обсудить индивидуальную консультацию.':'Вика, привет! Хочу записаться на первый уровень.\n'+(format==='offline'?'Офлайн':'Онлайн')+', '+dateText(product.date)+'.');
   document.querySelectorAll('[data-direct-telegram]').forEach(a=>a.href=target.href);
  };
- const markEdited=()=>{if(sending)return;error.textContent='';status.textContent='';requestId=null;submitted=false;submit.disabled=false;};
+ const markEdited=()=>{if(sending)return;error.textContent='';status.textContent='';confirm.textContent='';confirm.hidden=true;requestId=null;submitted=false;confirming=false;submitLabel.nodeValue='Отправить';submit.disabled=false;};
  const selectFormat=value=>{
   if(sending)return;
   format=value;product=format==='offline'?settings.offline:settings.course;
@@ -77,6 +79,7 @@
  form.addEventListener('submit',async event=>{
   event.preventDefault();if(sending||submitted)return;
   const payload=collect();if(!payload)return;
+  if(!confirming){confirming=true;confirm.textContent='Проверь, что контакты указаны без ошибки, и мы сможем написать тебе с учетом настроек доступа!';confirm.hidden=false;submitLabel.nodeValue='Проверила, отправить';submit.focus();return;}
   requestId=requestId||(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Array.from(crypto.getRandomValues(new Uint32Array(4))).join('-'));
   payload.requestId=requestId;sending=true;submit.disabled=true;submit.setAttribute('aria-busy','true');
   const controls=[...form.querySelectorAll('input:not(:disabled)'),$('#booking-name')];controls.forEach(input=>input.disabled=true);tabs.forEach(tab=>tab.disabled=true);
