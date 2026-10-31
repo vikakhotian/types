@@ -2,15 +2,12 @@ name: Manual CRM smoke test
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
   submit-and-check:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[crm-smoke]')
     runs-on: ubuntu-latest
     steps:
       - name: Submit one lead, retry it, and reject a bot payload
