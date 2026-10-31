@@ -1,0 +1,47 @@
+name: One-time CRM integration test
+
+on:
+  push:
+    paths:
+      - .github/workflows/crm-live-test.yml
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send valid, duplicate and invalid CRM requests
+        env:
+          CRM_ENDPOINT: https://script.google.com/macros/s/AKfycbzELuPL_Nj17w-D8WHDbYXkZ8237MKYtE2HjYHDZEymgr_16Dfw_B3rpS3WMijMSpUj4w/exec
+        run: |
+          python - <<'PY'
+          import json, os, urllib.parse, urllib.request
+
+          endpoint = os.environ['CRM_ENDPOINT']
+          base = {'website': ''}
+
+          def send(payload, expected_ok=True, expected_code=''):
+              data = urllib.parse.urlencode({'payload': json.dumps(payload, ensure_ascii=False)}).encode()
+              request = urllib.request.Request(endpoint, data=data, method='POST')
+              with urllib.request.urlopen(request, timeout=45) as response:
+                  body = response.read().decode()
+              marker = '"ok":true' if expected_ok else '"ok":false'
+              if marker not in body or (expected_code and f'"code":"{expected_code}"' not in body):
+                  raise RuntimeError(f'Unexpected CRM response: {body[:500]}')
+              print(payload.get('name', 'invalid case'), 'OK')
+
+          online = dict(base, requestId='crm-live-online-20261031', product='level-1', date='2026-11-01',
+                        name='ТЕСТ CRM Онлайн', contacts={'telegram':'@crm_test_online'})
+          offline = dict(base, requestId='crm-live-offline-20261031', product='level-1-offline', date='2026-11-08',
+                         name='ТЕСТ CRM Офлайн', contacts={'vk':'crm_test_offline','whatsapp':'+7 999 000-00-02'})
+          consultation = dict(base, requestId='crm-live-consult-20261031', product='consultation', date='консультация',
+                              name='ТЕСТ CRM Консультация', contacts={'vk':'crm_test_consult','telegram':'@crm_test_consult','whatsapp':'+7 999 000-00-03','email':'crm.test.consult@example.com'})
+
+          send(online)
+          send(offline)
+          send(consultation)
+          send(online)  # Same requestId must not create a second row.
+          send(dict(base, requestId='crm-invalid-date-20261031', product='level-1', date='2026-02-30',
+                    name='ТЕСТ Неверная дата', contacts={'telegram':'@crm_invalid_date'}), False, 'invalid_date')
+          send(dict(base, requestId='crm-invalid-bot-20261031', product='level-1', date='2026-11-01',
+                    name='ТЕСТ Бот', contacts={'telegram':'@crm_invalid_bot'}, website='spam'), False, 'invalid_request')
+          PY
