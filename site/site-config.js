@@ -9,7 +9,7 @@
   consultationUrl:base+'consultation/',
   consultationBookingUrl:base+'consultation/#consultation-contact',
   booking:Object.freeze({
-   deliveryMode:'telegram-draft',
+   deliveryMode:'apps-script',
    deliveryEndpoint:'',
    course:Object.freeze({id:'level-1',format:'online',title:'Саманта: Коды к мужчинам — первый уровень',date:'2026-11-01',startISO:null,durationMinutes:null,timeZone:'Europe/Moscow',price:1800}),
    offline:Object.freeze({id:'level-1-offline',format:'offline',title:'Саманта: Коды к мужчинам — первый уровень, офлайн',date:'2026-11-08',startISO:null,durationMinutes:null,timeZone:'Europe/Moscow',price:3500,location:'Лофт в центре Москвы — предварительная локация',preliminaryDate:true}),

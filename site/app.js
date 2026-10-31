@@ -154,7 +154,7 @@
   track.addEventListener('click', e => {
     const card=e.target.closest('.topic-card'); if(!card)return;
     const i=Number(card.dataset.topic),topic=topics[i];
-    openDialog(cards[i],topic.title,topic.question,topic.scene);
+    openDialog(cards.find(card=>Number(card.dataset.topic)===i),topic.title,topic.question,topic.scene);
   });
   $('#review-track').addEventListener('click',e=>{
     const card=e.target.closest('.review');if(!card)return;
@@ -184,8 +184,8 @@
   const mute = $('#video-mute');
   // Сам файл уже ускорен на 1.1x; множитель плеера считается от этой базы.
   video.defaultPlaybackRate=1.5;video.playbackRate=1.5;video.preservesPitch=true;
-  video.volume=0.5;video.muted=false;
-  mute.setAttribute("aria-label","Настроить громкость: 50 процентов");
+  video.volume=0.25;video.muted=false;
+  mute.setAttribute("aria-label","Настроить громкость: 25 процентов");
   $('#video-rate').addEventListener('change', e=>{video.playbackRate=Number(e.target.value);});
   const playPath = 'm7 3 15 9-15 9V3Z';
   const pausePath = 'M7 3v18M17 3v18';
@@ -202,13 +202,25 @@
   };
   const toggleVideo = async () => {
     if (!video.paused) return video.pause();
-    try { await video.play(); } catch { $('#video-error').hidden = false; }
+    try { await video.play(); $('#video-error').hidden=true; } catch(error) { if(error.name!=='AbortError')$('#video-error').hidden=false; }
   };
   overlay.addEventListener('click', toggleVideo);
   play.addEventListener('click', toggleVideo);
   video.addEventListener('click', toggleVideo);
   ['play', 'pause', 'ended', 'timeupdate', 'loadedmetadata'].forEach(event => video.addEventListener(event, updateVideo));
-  video.addEventListener('error', () => { $('#video-error').hidden = false; });
+  video.addEventListener('error', () => { if(video.error?.code!==1)$('#video-error').hidden=false; });
+  ['loadeddata','canplay','playing'].forEach(name=>video.addEventListener(name,()=>{$('#video-error').hidden=true;}));
+  $('#video-retry').addEventListener('click',()=>{video.load();$('#video-error').hidden=true;toggleVideo();});
+  const enlarge=$('#video-enlarge'),videoDialog=$('#video-dialog'),player=$('#video-player');
+  let anchor=null,restorePlaying=false;
+  enlarge.addEventListener('click',()=>{
+    restorePlaying=!video.paused;anchor=document.createComment('video-player');player.before(anchor);
+    videoDialog.querySelector('.video-dialog-content').append(player);videoDialog.showModal();document.body.style.overflow='hidden';
+    if(restorePlaying)video.play().catch(()=>{});
+  });
+  videoDialog.querySelector('.video-dialog-close').addEventListener('click',()=>videoDialog.close());
+  videoDialog.addEventListener('click',e=>{if(e.target===videoDialog){const r=videoDialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)videoDialog.close();}});
+  videoDialog.addEventListener('close',()=>{const wasPlaying=!video.paused;anchor.replaceWith(player);document.body.style.overflow='';enlarge.focus({preventScroll:true});if(wasPlaying)video.play().catch(()=>{});});
   seek.addEventListener('input', () => {
     if (Number.isFinite(video.duration)) video.currentTime = Number(seek.value) / 100 * video.duration;
     updateVideo();

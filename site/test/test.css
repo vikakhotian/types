@@ -79,4 +79,4 @@
 /* Вопрос 7: отдельный обновленный сюжет, остальные иллюстрации сохранены. */
 .art-7{position:relative;background-image:url('assets/quiz-scenes.webp');background-size:300% 400%;background-position:0% 66.666667%}
 /* Слева всегда исходный мужчина из общей таблицы, правка только в области женщины. */
-.art-7:after{content:'';position:absolute;inset:0;background:url('assets/quiz-couple-07.webp') center/contain no-repeat;clip-path:polygon(60% 0,100% 0,100% 100%,47% 100%,50% 91%,49% 84%,48% 76%,49% 66%,52% 56%,55% 47%,59% 43%,68% 42%,68% 37%,61% 33%,61% 25%,60% 20%)}
+.art-7:after{content:'';position:absolute;inset:0;background:url('assets/quiz-couple-07.webp?v=13') center/contain no-repeat;clip-path:polygon(55% 40%,100% 40%,100% 100%,47% 100%,50% 90%,50% 75%,50% 60%,49% 43%)}

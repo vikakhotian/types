@@ -241,3 +241,14 @@ body{background:var(--paper)}
 .portrait-natalia{background-position:0% 50%!important}.portrait-tatyana-mironova{background-position:25% 50%!important}.portrait-roman{background-position:50% 50%!important}.portrait-maria{background-position:75% 50%!important}.portrait-stanislav{background-position:100% 50%!important}
 
 .portrait-tatyana-urda{background-image:url('assets/review-tatyana-urda.webp')!important;background-size:160% auto!important;background-position:50% 30%!important}
+
+.role-portrait{display:block;width:43px;height:43px;flex:0 0 43px;background-image:url('assets/role-portraits.webp');background-size:300% 200%;border-radius:50%;mix-blend-mode:multiply}
+.role-portrait-0{background-position:0 0}.role-portrait-1{background-position:50% 0}.role-portrait-2{background-position:100% 0}.role-portrait-3{background-position:0 100%}.role-portrait-4{background-position:50% 100%}.role-portrait-5{background-position:100% 100%}
+.relations .role-item{gap:10px;align-items:center}.ink-mark.ink-lilac{background:#ead2f2!important;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.fit-expand{width:36px;height:36px;justify-content:center;padding:7px;bottom:14px;right:15px}.fit-expand:hover{text-decoration:none}
+.bonus>.icon,.bonus-key-icon{color:#b28a39!important}.footer .ctas{flex-wrap:wrap;gap:15px 28px}.footer .consultation-footer{font-size:26px!important}
+@media(max-width:480px){.role-portrait{width:36px;height:36px;flex-basis:36px}.relations .role-item{gap:8px}.footer .consultation-footer{font-size:25px!important}}
+
+.video-dialog{width:min(94vw,535px);max-height:95svh;overflow:auto;border:1px solid #baa48d;background:#fffdf8;padding:47px 20px 22px;color:#593e34}.video-dialog::backdrop{background:#30261ed4}.video-dialog-close{position:absolute;right:10px;top:8px;font-size:29px}.video-dialog .video-player{width:min(480px,calc(100svh - 180px));max-width:100%;margin:auto}.video-dialog .video-circle{width:100%;height:auto;aspect-ratio:1}.video-dialog video{width:100%;height:100%;object-fit:cover}.video-dialog .player-controls{width:100%;max-width:none}#video-retry{border:0;background:none;color:inherit;text-decoration:underline;cursor:pointer;font:inherit}
+
+.scene{background-image:url('assets/scenes.webp?v=13')}
