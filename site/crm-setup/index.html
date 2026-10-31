@@ -67,7 +67,10 @@ function validateBooking(r) {
     labels.push(CRM_LABELS[key]); links.push(url);
   });
   let date = &#x27;&#x27;;
-  if (r.product !== &#x27;consultation&#x27;) {
+  if (r.product === &#x27;consultation&#x27;) {
+    if (r.date !== undefined &amp;&amp; r.date !== null &amp;&amp; r.date !== &#x27;&#x27; &amp;&amp; r.date !== &#x27;консультация&#x27;) throw new Error(&#x27;invalid_date&#x27;);
+    date = &#x27;консультация&#x27;;
+  } else {
     date = r.date;
     if (typeof date !== &#x27;string&#x27; || !/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error(&#x27;invalid_date&#x27;);
     const parsed = new Date(date + &#x27;T12:00:00Z&#x27;);
@@ -106,7 +109,8 @@ function saveLead(lead) {
   sheet.getRange(row,col.links).setRichTextValue(rich.build()).setWrap(true);
   sheet.getRange(row,col.channels).setWrap(true);
   sheet.getRange(row,col.registered_at).setValue(new Date()).setNumberFormat(&#x27;dd.mm.yyyy&#x27;);
-  if (lead.date) sheet.getRange(row,col.event_date).setValue(Utilities.parseDate(lead.date+&#x27; 12:00&#x27;,&#x27;Europe/Moscow&#x27;,&#x27;yyyy-MM-dd HH:mm&#x27;)).setNumberFormat(&#x27;dd.mm.yyyy&#x27;);
+  if (lead.date === &#x27;консультация&#x27;) plain(&#x27;event_date&#x27;,&#x27;консультация&#x27;);
+  else if (lead.date) sheet.getRange(row,col.event_date).setValue(Utilities.parseDate(lead.date+&#x27; 12:00&#x27;,&#x27;Europe/Moscow&#x27;,&#x27;yyyy-MM-dd HH:mm&#x27;)).setNumberFormat(&#x27;dd.mm.yyyy&#x27;);
   SpreadsheetApp.flush();
   // Readback before acknowledgement. Failure never produces a success confirmation.
   if (sheet.getRange(row,col.name).getDisplayValue() !== lead.name || sheet.getRange(row,col.lead_source).getDisplayValue() !== &#x27;сайт&#x27; || sheet.getRange(row,col.links).getDisplayValue() !== joined) throw new Error(&#x27;crm_unavailable&#x27;);

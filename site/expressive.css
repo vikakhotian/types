@@ -311,3 +311,45 @@ body{background:var(--paper)}
  .methods-list li:nth-child(3){margin-left:2%!important}
  .methods-list li:nth-child(5){margin-left:5%!important}
 }
+
+/* Version 20: a calm stack of hand-drawn books instead of another field of color. */
+.methods-note h2 .ink-mark{background:none;padding:0}
+.methods-list{
+ display:flex;
+ flex-direction:column;
+ align-items:flex-start;
+ gap:9px;
+ max-width:1000px;
+ margin:26px auto 0;
+ padding:10px 20px 35px;
+ overflow:visible;
+}
+.methods-list li,
+.methods-list li:nth-child(n){
+ display:block;
+ width:82%;
+ margin:0!important;
+ padding:17px 76px 17px 28px;
+ color:#49372f;
+ background:#fffdf8;
+ border:2px solid #8c6a50;
+ border-radius:8px 14px 11px 7px;
+ clip-path:none;
+ box-shadow:4px 5px 0 #d9c9b7;
+ font-size:16px;
+ line-height:1.65;
+ transform:rotate(-.45deg);
+}
+.methods-list li:nth-child(2){width:88%;margin-left:7%!important;transform:rotate(.5deg)}
+.methods-list li:nth-child(3){width:76%;margin-left:3%!important;transform:rotate(-.7deg)}
+.methods-list li:nth-child(4){width:84%;margin-left:12%!important;transform:rotate(.35deg)}
+.methods-list li:nth-child(5){width:80%;margin-left:8%!important;transform:rotate(-.25deg)}
+.methods-list li:before{display:block!important;content:''!important;position:absolute;left:15px;top:5px;bottom:5px;width:5px;height:auto;background:none;border-left:1px solid #b69a80;border-right:1px solid #b69a80}
+.methods-list li:after{content:'';position:absolute;right:18px;top:7px;bottom:7px;width:38px;height:auto;border:0;border-left:1px solid #c8b29d;border-right:1px solid #c8b29d;border-radius:0;opacity:.85;transform:none;background:repeating-linear-gradient(to bottom,transparent 0 7px,#d8c8b9 7px 8px)}
+@media(max-width:760px){
+ .methods-list{display:flex;padding:5px 4px 27px;gap:8px}
+ .methods-list li,.methods-list li:nth-child(n){width:94%;margin-left:0!important;padding:15px 55px 15px 23px;font-size:15px;line-height:1.6}
+ .methods-list li:nth-child(even){align-self:flex-end}
+ .methods-list li:before{left:11px}
+ .methods-list li:after{right:13px;width:25px}
+}

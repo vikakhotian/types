@@ -56,7 +56,7 @@
    contacts[check.value]=input.value;
   }
   if(!form.checkValidity()){form.reportValidity();error.textContent='Проверь имя и выбранные контакты';return null;}
-  return {product:product.id,name:name.value,contacts,date:consultation?null:product.date,format:consultation?'online':format,website:form.querySelector('[name=website]').value};
+  return {product:product.id,name:name.value,contacts,date:consultation?'консультация':product.date,format:consultation?'online':format,website:form.querySelector('[name=website]').value};
  };
  const sendToCRM=payload=>new Promise((resolve,reject)=>{
   let endpoint;

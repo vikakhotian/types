@@ -7,10 +7,12 @@ test('Четыре канала превращаются в точные ссы�
 });
 test('Дата берется из текущего предложения, не из дня отправки',()=>{
  for(const date of ['2026-11-01','2026-11-08','2027-02-03']){const r=base();r.date=date;assert.equal(c.validateBooking(r).date,date);}
- const r=base();r.product='consultation';delete r.date;assert.equal(c.validateBooking(r).date,'');
+ const r=base();r.product='consultation';delete r.date;assert.equal(c.validateBooking(r).date,'консультация');
+ const labeled=base();labeled.product='consultation';labeled.date='консультация';assert.equal(c.validateBooking(labeled).date,'консультация');
 });
 test('Ошибочные даты, пустые контакты, неизвестный канал и ловушка ботов отклоняются',()=>{
  for(const patch of [{date:'2026-02-30'},{date:'bad'},{contacts:{}},{contacts:{other:'bad'}},{website:'spam'},{contacts:{email:'bad'}},{name:'A'},{requestId:'x'}])assert.throws(()=>c.validateBooking({...base(),...patch}));
+ const consultation=base();consultation.product='consultation';consultation.date='2026-11-01';assert.throws(()=>c.validateBooking(consultation));
 });
 test('Переименование и перестановка столбцов не меняет смысл записи',()=>{
  const columns={name:8,lead_source:3,channels:6,links:2,registered_at:7,event_date:10};
