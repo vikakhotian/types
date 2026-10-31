@@ -20,3 +20,8 @@ test('Переименование и перестановка столбцов 
  c.SpreadsheetApp={openById:()=>({getSheetById:()=>({getSheetId:()=>42}),createDeveloperMetadataFinder:()=>({withKey(){return this;},find:()=>Object.entries(columns).map(([field,col])=>({getValue:()=>field,getLocation:()=>({getColumn:()=>({getSheet:()=>({getSheetId:()=>42}),getColumn:()=>col})})}))})})};
  assert.deepEqual(JSON.parse(JSON.stringify(c.getCRM().columns)),columns);
 });
+test('Письмо содержит услугу, контакты и дату и отправляется на почту Вики',()=>{
+ let sent;c.MailApp={sendEmail:message=>{sent=message}};
+ const lead=c.validateBooking({...base(),contacts:{telegram:'@example_user',email:'test@example.com'}});c.sendLeadEmail(lead);
+ assert.equal(sent.to,'vhotyan@gmail.com');assert.match(sent.subject,/Первый уровень · онлайн/);assert.match(sent.body,/Тест/);assert.match(sent.body,/https:\/\/t\.me\/example_user/);assert.match(sent.body,/mailto:test@example\.com/);assert.match(sent.body,/2026-11-01/);
+});

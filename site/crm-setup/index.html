@@ -1,6 +1,8 @@
 <!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Подключение CRM</title><style>body{font:18px/1.7 system-ui;max-width:850px;margin:40px auto;padding:20px;background:#fffdf8;color:#593e34}button{font:inherit;padding:12px 25px;cursor:pointer}textarea{display:block;width:100%;height:300px;margin-top:25px;font:13px/1.5 monospace}</style><h1>Код для твоей CRM</h1><p>Нажми «Скопировать код». В редакторе Apps Script кликни по коду, нажми Ctrl+A, затем Ctrl+V и сохрани Ctrl+S. Текст <code>function myFunction()</code> и путь к файлу нужно заменить целиком.</p><button id="copy">Скопировать код</button><p id="status" role="status"></p><textarea id="code" readonly aria-label="Полный код Apps Script">/* Приемник заявок Саманты. Таблица остается закрытой. URL CRM не возвращается посетителям. */
 const CRM_FIELDS = [&#x27;name&#x27;, &#x27;lead_source&#x27;, &#x27;channels&#x27;, &#x27;links&#x27;, &#x27;registered_at&#x27;, &#x27;event_date&#x27;];
 const CRM_LABELS = {vk:&#x27;ВКонтакте&#x27;, telegram:&#x27;Телеграм&#x27;, whatsapp:&#x27;WhatsApp&#x27;, email:&#x27;email&#x27;};
+const CRM_PRODUCTS = {&#x27;level-1&#x27;:&#x27;Первый уровень · онлайн&#x27;, &#x27;level-1-offline&#x27;:&#x27;Первый уровень · офлайн&#x27;, consultation:&#x27;Индивидуальная консультация&#x27;};
+const CRM_NOTIFICATION_EMAIL = &#x27;vhotyan@gmail.com&#x27;;
 
 function doGet() {
   return ContentService.createTextOutput(&#x27;Samantha booking receiver&#x27;).setMimeType(ContentService.MimeType.TEXT);
@@ -18,6 +20,7 @@ function doPost(e) {
       const cache = CacheService.getScriptCache(), key = &#x27;booking:&#x27; + request.requestId;
       if (!cache.get(key)) {
         saveLead(lead);
+        try { sendLeadEmail(lead); } catch (emailError) { console.error(&#x27;Заявка сохранена, письмо не отправлено: &#x27; + emailError.message); }
         cache.put(key, &#x27;saved&#x27;, 21600);
       }
       result = {ok:true};
@@ -38,7 +41,7 @@ function validateBooking(r) {
   if (!r || !/^[a-zA-Z0-9-]{16,80}$/.test(r.requestId || &#x27;&#x27;) || r.website) throw new Error(&#x27;invalid_request&#x27;);
   const name = typeof r.name === &#x27;string&#x27; ? r.name.trim() : &#x27;&#x27;;
   if (name.length &lt; 2 || name.length &gt; 80 || /[\u0000-\u001f]/.test(name)) throw new Error(&#x27;invalid_name&#x27;);
-  if (![&#x27;level-1&#x27;,&#x27;level-1-offline&#x27;,&#x27;consultation&#x27;].includes(r.product)) throw new Error(&#x27;invalid_request&#x27;);
+  if (!CRM_PRODUCTS[r.product]) throw new Error(&#x27;invalid_request&#x27;);
   const contacts = r.contacts;
   if (!contacts || typeof contacts !== &#x27;object&#x27; || Array.isArray(contacts)) throw new Error(&#x27;invalid_contacts&#x27;);
   const keys = Object.keys(contacts);
@@ -76,7 +79,20 @@ function validateBooking(r) {
     const parsed = new Date(date + &#x27;T12:00:00Z&#x27;);
     if (!isFinite(+parsed) || parsed.toISOString().slice(0,10) !== date || +date.slice(0,4) &lt; 2026 || +date.slice(0,4) &gt; 2100) throw new Error(&#x27;invalid_date&#x27;);
   }
-  return {name:name, labels:labels, links:links, date:date};
+  return {name:name, labels:labels, links:links, date:date, product:r.product};
+}
+function sendLeadEmail(lead) {
+  const body = [
+    &#x27;Новая заявка с сайта Саманты&#x27;,
+    &#x27;&#x27;,
+    &#x27;Имя: &#x27; + lead.name,
+    &#x27;Запрос: &#x27; + CRM_PRODUCTS[lead.product],
+    &#x27;Где связаться: &#x27; + lead.labels.join(&#x27;, &#x27;),
+    &#x27;Ссылки:&#x27;,
+    lead.links.join(&#x27;\n&#x27;),
+    &#x27;Дата урока: &#x27; + lead.date
+  ].join(&#x27;\n&#x27;);
+  MailApp.sendEmail({to:CRM_NOTIFICATION_EMAIL,subject:&#x27;Новая заявка с сайта — &#x27; + CRM_PRODUCTS[lead.product],body:body,name:&#x27;Саманта — заявки&#x27;});
 }
 function getCRM() {
   const props = PropertiesService.getScriptProperties();

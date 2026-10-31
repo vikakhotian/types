@@ -131,10 +131,11 @@
 .consultation-price+.consultation-contact{margin-top:25px}
 @media(max-width:900px){
  .consultation-tools ul{grid-template-columns:1fr;gap:0}
- .consultation-tools li{padding:16px 12px 17px 57px;text-align:left;border-bottom:1px dashed #d8c6b5}
+ .consultation-tools li{display:grid;grid-template-columns:43px minmax(0,1fr);align-items:start;gap:7px;padding:14px 8px 15px;text-align:left;border-bottom:1px dashed #d8c6b5}
  .consultation-tools li+li{border-left:0}
  .consultation-tools li:last-child{border-bottom:0}
- .consultation-tools li:before{left:7px;top:13px;translate:0 0}
+ .consultation-tools li:before{position:static;left:auto;top:auto;translate:0 0;grid-column:1}
+ .consultation-tools li>span{grid-column:2;min-width:0}
 }
 @media(max-width:760px){
  .consultation-tools{margin:38px 0 22px;padding:30px 17px 18px}

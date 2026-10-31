@@ -1,6 +1,8 @@
 /* Приемник заявок Саманты. Таблица остается закрытой. URL CRM не возвращается посетителям. */
 const CRM_FIELDS = ['name', 'lead_source', 'channels', 'links', 'registered_at', 'event_date'];
 const CRM_LABELS = {vk:'ВКонтакте', telegram:'Телеграм', whatsapp:'WhatsApp', email:'email'};
+const CRM_PRODUCTS = {'level-1':'Первый уровень · онлайн', 'level-1-offline':'Первый уровень · офлайн', consultation:'Индивидуальная консультация'};
+const CRM_NOTIFICATION_EMAIL = 'vhotyan@gmail.com';
 
 function doGet() {
   return ContentService.createTextOutput('Samantha booking receiver').setMimeType(ContentService.MimeType.TEXT);
@@ -18,6 +20,7 @@ function doPost(e) {
       const cache = CacheService.getScriptCache(), key = 'booking:' + request.requestId;
       if (!cache.get(key)) {
         saveLead(lead);
+        try { sendLeadEmail(lead); } catch (emailError) { console.error('Заявка сохранена, письмо не отправлено: ' + emailError.message); }
         cache.put(key, 'saved', 21600);
       }
       result = {ok:true};
@@ -38,7 +41,7 @@ function validateBooking(r) {
   if (!r || !/^[a-zA-Z0-9-]{16,80}$/.test(r.requestId || '') || r.website) throw new Error('invalid_request');
   const name = typeof r.name === 'string' ? r.name.trim() : '';
   if (name.length < 2 || name.length > 80 || /[\u0000-\u001f]/.test(name)) throw new Error('invalid_name');
-  if (!['level-1','level-1-offline','consultation'].includes(r.product)) throw new Error('invalid_request');
+  if (!CRM_PRODUCTS[r.product]) throw new Error('invalid_request');
   const contacts = r.contacts;
   if (!contacts || typeof contacts !== 'object' || Array.isArray(contacts)) throw new Error('invalid_contacts');
   const keys = Object.keys(contacts);
@@ -76,7 +79,20 @@ function validateBooking(r) {
     const parsed = new Date(date + 'T12:00:00Z');
     if (!isFinite(+parsed) || parsed.toISOString().slice(0,10) !== date || +date.slice(0,4) < 2026 || +date.slice(0,4) > 2100) throw new Error('invalid_date');
   }
-  return {name:name, labels:labels, links:links, date:date};
+  return {name:name, labels:labels, links:links, date:date, product:r.product};
+}
+function sendLeadEmail(lead) {
+  const body = [
+    'Новая заявка с сайта Саманты',
+    '',
+    'Имя: ' + lead.name,
+    'Запрос: ' + CRM_PRODUCTS[lead.product],
+    'Где связаться: ' + lead.labels.join(', '),
+    'Ссылки:',
+    lead.links.join('\n'),
+    'Дата урока: ' + lead.date
+  ].join('\n');
+  MailApp.sendEmail({to:CRM_NOTIFICATION_EMAIL,subject:'Новая заявка с сайта — ' + CRM_PRODUCTS[lead.product],body:body,name:'Саманта — заявки'});
 }
 function getCRM() {
   const props = PropertiesService.getScriptProperties();
