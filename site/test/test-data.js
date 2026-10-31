@@ -53,10 +53,18 @@ window.SAMANTA_TEST_DATA = {
       "id": 3,
       "title": "Как лучше договариваться о встречах с таким мужчиной?",
       "multi": true,
+      "scores": [
+        0,
+        2,
+        1,
+        0
+      ],
       "correct": [
         1,
         2
       ],
+      "aggregation": "best",
+      "help": "Можно выбрать один или несколько вариантов.",
       "options": [
         {
           "lead": "Четко фиксировать все заранее",
@@ -109,10 +117,18 @@ window.SAMANTA_TEST_DATA = {
       "id": 5,
       "title": "Ты ему — километры голосовых. Он тебе — сухое «Договорились». Это избегающий тип привязанности?",
       "multi": true,
+      "scores": [
+        0,
+        2,
+        0,
+        1
+      ],
       "correct": [
         1,
         3
       ],
+      "aggregation": "best",
+      "help": "Можно выбрать один или несколько вариантов.",
       "options": [
         {
           "lead": "Все очевидно",
@@ -140,7 +156,7 @@ window.SAMANTA_TEST_DATA = {
         1,
         2,
         0,
-        1
+        2
       ],
       "options": [
         {
@@ -168,7 +184,7 @@ window.SAMANTA_TEST_DATA = {
       "scores": [
         0,
         2,
-        2
+        0
       ],
       "options": [
         {
@@ -268,8 +284,8 @@ window.SAMANTA_TEST_DATA = {
       "scores": [
         1,
         2,
-        1,
-        1,
+        0,
+        0,
         2
       ],
       "maxSelect": 2,

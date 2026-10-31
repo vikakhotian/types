@@ -13,12 +13,13 @@
     if (question.maxSelect) return answers.reduce((total,i) => total + question.scores[i],0);
     if (!question.multi) return question.scores[answers[0]];
     if (answers.some(i => !question.correct.includes(i))) return 0;
+    if (question.aggregation === 'best') return Math.max(...answers.map(i => question.scores[i]));
     return answers.length === question.correct.length ? 2 : 1;
   };
   const resultIndex = points => {
     if (points.length !== 12 || points.some((n,i) => !Number.isInteger(n) || n<0 || n>(i===10?4:2))) throw new RangeError('Некорректные баллы');
     const total = points.reduce((sum, n) => sum + n, 0);
-    if (total >= 24 && !points.includes(0)) return 0;
+    if (total > 22) return 0;
     if (total >= 20) return 1;
     if (total >= 16) return 2;
     return 3;

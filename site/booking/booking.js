@@ -81,7 +81,7 @@
   payload.requestId=requestId;sending=true;submit.disabled=true;submit.setAttribute('aria-busy','true');
   const controls=[...form.querySelectorAll('input:not(:disabled)'),$('#booking-name')];controls.forEach(input=>input.disabled=true);tabs.forEach(tab=>tab.disabled=true);
   try{
-   await sendToCRM(payload);submitted=true;status.textContent='Заявка отправлена';
+   await sendToCRM(payload);submitted=true;status.textContent=consultation?'Записано! Скоро свяжемся с тобой.':'Записано! Скоро пришлем ссылку на занятие и данные для оплаты.';
   }catch(e){error.textContent=e.message==='not-connected'?'Форма пока недоступна. Напиши мне напрямую справа.':'Не получилось подтвердить отправку. Попробуй еще раз или напиши мне напрямую.';}
   finally{sending=false;controls.forEach(input=>input.disabled=false);tabs.forEach(tab=>tab.disabled=false);submit.disabled=submitted;submit.removeAttribute('aria-busy');}
  });

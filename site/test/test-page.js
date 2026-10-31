@@ -51,7 +51,7 @@
       help.id = `question-help-${index + 1}`;
       help.className = 'question-help';
       if (question.maxSelect) help.setAttribute('aria-live', 'polite');
-      help.textContent = question.maxSelect ? 'Выбери не более двух вариантов' : question.onlyChoice !== undefined ? 'Возможен выбор одного или нескольких вариантов' : question.multi ? 'Можно выбрать несколько вариантов' : 'Выбери один вариант';
+      help.textContent = question.help || (question.maxSelect ? 'Выбери не более двух вариантов' : question.onlyChoice !== undefined ? 'Возможен выбор одного или нескольких вариантов' : question.multi ? 'Можно выбрать несколько вариантов' : 'Выбери один вариант');
       fieldset.setAttribute('aria-describedby', help.id);
       fieldset.append(help);
       const options = [];
