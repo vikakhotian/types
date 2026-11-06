@@ -28,3 +28,41 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify current production copy
+        env:
+          SITE_URL: https://vikakhotian.github.io/types
+          CRM_ENDPOINT: https://script.google.com/macros/s/AKfycbzELuPL_Nj17w-D8WHDbYXkZ8237MKYtE2HjYHDZEymgr_16Dfw_B3rpS3WMijMSpUj4w/exec
+        run: |
+          python3 - <<'PY'
+          import json, os, time, urllib.parse, urllib.request
+          base = os.environ['SITE_URL']
+          expected = {
+              base + '/?verify=' + os.environ['GITHUB_SHA']: ['Как будет на вашем 16 языке любви?', 'Запись на первый поток'],
+              base + '/booking/?verify=' + os.environ['GITHUB_SHA']: ['9 ноября 2026', '22 ноября 2026', 'Предварительное расписание первого потока'],
+          }
+          for attempt in range(12):
+              try:
+                  for url, phrases in expected.items():
+                      with urllib.request.urlopen(url, timeout=20) as response:
+                          page = response.read().decode('utf-8')
+                      assert all(phrase in page for phrase in phrases), (url, phrases)
+                  break
+              except Exception:
+                  if attempt == 11:
+                      raise
+                  time.sleep(10)
+          payload = {
+              'requestId': 'pages-verify-' + os.environ['GITHUB_RUN_ID'],
+              'name': 'ТЕСТ ПУБЛИКАЦИИ — УДАЛИТЬ',
+              'product': 'consultation',
+              'date': 'консультация',
+              'referral': 'Проверка GitHub Pages: новая версия опубликована',
+              'website': '',
+              'contacts': {'email': 'vhotyan@gmail.com'},
+          }
+          data = urllib.parse.urlencode({'payload': json.dumps(payload, ensure_ascii=False)}).encode()
+          request = urllib.request.Request(os.environ['CRM_ENDPOINT'], data=data, headers={'Content-Type':'application/x-www-form-urlencoded','Origin':'https://vikakhotian.github.io'})
+          with urllib.request.urlopen(request, timeout=30) as response:
+              result = response.read().decode('utf-8')
+          assert '"ok":true' in result
+          PY
