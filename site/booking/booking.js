@@ -14,7 +14,7 @@
  const dateText=date=>new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric',timeZone:'Europe/Moscow'}).format(new Date(date+'T12:00:00Z')).replace(/ г\.$/,'');
  const updateDirect=()=>{
   const target=new URL(config.telegramUrl);
-  target.searchParams.set('text',consultation?'Вика, привет! Хочу обсудить индивидуальную консультацию.':'Вика, привет! Хочу записаться на первый уровень.\n'+(format==='offline'?'Офлайн':'Онлайн')+', '+dateText(product.date)+'.');
+  target.searchParams.set('text',consultation?'Вика, привет! Хочу обсудить индивидуальную консультацию.':'Вика, привет! Хочу записаться на первый поток.\n'+(format==='offline'?'Офлайн':'Онлайн')+', '+dateText(product.date)+'.');
   document.querySelectorAll('[data-direct-telegram]').forEach(a=>a.href=target.href);
  };
  const markEdited=()=>{if(sending)return;error.textContent='';status.textContent='';confirm.textContent='';confirm.hidden=true;requestId=null;submitted=false;confirming=false;submitLabel.nodeValue='Отправить';submit.disabled=false;};
@@ -46,7 +46,8 @@
  form.querySelectorAll('.text-input').forEach(input=>input.addEventListener('input',()=>{input.setCustomValidity('');markEdited();}));
  const clean=(key,value)=>value.trim().replace(key==='telegram'?/^https?:\/\/(?:www\.)?t\.me\//i:key==='vk'?/^https?:\/\/(?:www\.)?vk\.(?:com|ru)\//i:/$^/,'').replace(/\/$/,'');
  const collect=()=>{
-  error.textContent='';status.textContent='';const name=$('#booking-name');name.value=name.value.trim();name.setCustomValidity('');
+  error.textContent='';status.textContent='';const name=$('#booking-name'),referral=form.querySelector('[name=referral]');name.value=name.value.trim();name.setCustomValidity('');
+  if(referral)referral.value=referral.value.trim();
   if(name.value.length<2)name.setCustomValidity('Напиши, пожалуйста, как к тебе обращаться');
   if(!choices.some(c=>c.checked)){error.textContent='Выбери, где удобнее с тобой связаться';choices[0].focus();return null;}
   const contacts={};
@@ -58,7 +59,7 @@
    contacts[check.value]=input.value;
   }
   if(!form.checkValidity()){form.reportValidity();error.textContent='Проверь имя и выбранные контакты';return null;}
-  return {product:product.id,name:name.value,contacts,date:consultation?'консультация':product.date,format:consultation?'online':format,website:form.querySelector('[name=website]').value};
+  return {product:product.id,name:name.value,contacts,date:consultation?'консультация':product.date,format:consultation?'online':format,referral:referral?referral.value:'',website:form.querySelector('[name=website]').value};
  };
  const sendToCRM=payload=>new Promise((resolve,reject)=>{
   let endpoint;

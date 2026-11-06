@@ -1,5 +1,5 @@
 /* Приемник заявок Саманты. Таблица остается закрытой. URL CRM не возвращается посетителям. */
-const CRM_FIELDS = ['name', 'lead_source', 'channels', 'links', 'registered_at', 'event_date'];
+const CRM_FIELDS = ['name', 'lead_source', 'channels', 'links', 'registered_at', 'event_date', 'referral'];
 const CRM_LABELS = {vk:'ВКонтакте', telegram:'Телеграм', whatsapp:'WhatsApp', email:'email'};
 const CRM_PRODUCTS = {'level-1':'Первый уровень · онлайн', 'level-1-offline':'Первый уровень · офлайн', consultation:'Индивидуальная консультация'};
 const CRM_NOTIFICATION_EMAIL = 'vhotyan@gmail.com';
@@ -79,7 +79,9 @@ function validateBooking(r) {
     const parsed = new Date(date + 'T12:00:00Z');
     if (!isFinite(+parsed) || parsed.toISOString().slice(0,10) !== date || +date.slice(0,4) < 2026 || +date.slice(0,4) > 2100) throw new Error('invalid_date');
   }
-  return {name:name, labels:labels, links:links, date:date, product:r.product};
+  const referral = typeof r.referral === 'string' ? r.referral.trim() : '';
+  if (referral.length > 300 || /[\u0000-\u001f]/.test(referral)) throw new Error('invalid_request');
+  return {name:name, labels:labels, links:links, date:date, product:r.product, referral:referral};
 }
 function sendLeadEmail(lead) {
   const body = [
@@ -90,7 +92,8 @@ function sendLeadEmail(lead) {
     'Где связаться: ' + lead.labels.join(', '),
     'Ссылки:',
     lead.links.join('\n'),
-    'Дата урока: ' + lead.date
+    'Дата урока: ' + lead.date,
+    'Откуда узнали: ' + (lead.referral || 'не указано')
   ].join('\n');
   MailApp.sendEmail({to:CRM_NOTIFICATION_EMAIL,subject:'Новая заявка с сайта — ' + CRM_PRODUCTS[lead.product],body:body,name:'Саманта — заявки'});
 }
@@ -127,6 +130,7 @@ function saveLead(lead) {
   sheet.getRange(row,col.registered_at).setValue(new Date()).setNumberFormat('dd.mm.yyyy');
   if (lead.date === 'консультация') plain('event_date','консультация');
   else if (lead.date) sheet.getRange(row,col.event_date).setValue(Utilities.parseDate(lead.date+' 12:00','Europe/Moscow','yyyy-MM-dd HH:mm')).setNumberFormat('dd.mm.yyyy');
+  plain('referral',lead.referral || '');
   SpreadsheetApp.flush();
   // Readback before acknowledgement. Failure never produces a success confirmation.
   if (sheet.getRange(row,col.name).getDisplayValue() !== lead.name || sheet.getRange(row,col.lead_source).getDisplayValue() !== 'сайт' || sheet.getRange(row,col.links).getDisplayValue() !== joined) throw new Error('crm_unavailable');
@@ -141,6 +145,15 @@ function setupConnection() {
  if (!book) throw new Error('Открой редактор из своей Google-таблицы через Расширения → Apps Script');
  const sheet = book.getSheetByName('CRM');
  if (!sheet) throw new Error('В этой таблице нет вкладки CRM');
+ ensureReferralField(sheet);
  PropertiesService.getScriptProperties().setProperties({SPREADSHEET_ID:book.getId(),CRM_SHEET_ID:String(sheet.getSheetId()),SITE_ORIGIN:'https://vikakhotian.github.io'});
  return checkConnection();
+}
+function ensureReferralField(sheet) {
+ const finder = sheet.getParent().createDeveloperMetadataFinder().withKey('SAMANTA_CRM_FIELD').find();
+ if (finder.some(item => item.getValue() === 'referral' && item.getLocation().getColumn().getSheet().getSheetId() === sheet.getSheetId())) return;
+ const headers = sheet.getRange(1,1,1,Math.max(1,sheet.getLastColumn())).getDisplayValues()[0];
+ let column = headers.findIndex(value => String(value).trim().toLowerCase() === 'откуда узнали') + 1;
+ if (!column) { column = sheet.getLastColumn() + 1; sheet.getRange(1,column).setValue('откуда узнали'); }
+ sheet.getRange(1,column).addDeveloperMetadata('SAMANTA_CRM_FIELD','referral',SpreadsheetApp.DeveloperMetadataVisibility.DOCUMENT);
 }

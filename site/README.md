@@ -25,7 +25,7 @@ https://raw.githubusercontent.com/vikakhotian/types/main/assets/brand/vika-video
 Единственный источник адресов — `site-config.js`:
 
 - `homeUrl`: главный лендинг; все логотипы ведут сюда.
-- `contactUrl`: `https://t.me/vikanio`; сюда ведут и «Контакты», и «Запись на первый уровень».
+- `contactUrl`: `https://t.me/vikanio`; сюда ведут и «Контакты», и «Запись на первый поток».
 - `testUrl`: `https://samanta-kody-k-muzhchinam-vika.koalspb.chatgpt.site/test/`. Опубликована страница в подготовке; сам тест подключается отдельно.
 
 На странице теста нужно последовательно подключить `site-config.js`, затем `site-navigation.js` с `defer`. Если тест находится в подпапке, использовать корректные относительные пути, например `../site-config.js` и `../site-navigation.js`. Логотипу добавить атрибут `data-site-home`, ссылкам контактов и записи — `data-site-contact`. Кнопке перехода в тест — `data-site-test`. Эти атрибуты не требуют дублировать адреса в коде теста. Чтобы позднее открыть общую форму вместо Telegram, достаточно изменить только `contactUrl`.
