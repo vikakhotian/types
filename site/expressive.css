@@ -436,3 +436,11 @@ body .site-header nav a{padding:6px 0 5px;font-size:12px}
  body .site-header nav.open{display:flex;flex-direction:column;gap:0;align-items:stretch}
  body .site-header nav a{padding:9px 0;font-size:14px}
 }
+
+/* Version 23: the extended course title keeps its hierarchy on every screen. */
+.hero-title-main{font-weight:600}
+.hero-title-tail{display:inline-block;margin-left:.14em;font-size:.56em;font-weight:500;line-height:1;white-space:nowrap;vertical-align:.12em;color:#795a43}
+.level-title strong{font-weight:700}
+@media(max-width:760px){
+ .hero-title-tail{display:block;margin:.1em 0 0 .05em;font-size:.52em}
+}
