@@ -5,11 +5,10 @@
  const settings=config.booking,$=s=>document.querySelector(s),params=new URLSearchParams(location.search);
  const consultation=!!document.querySelector('[data-booking-kind="consultation"]')||params.get('kind')==='consultation';
  const tabs=[...document.querySelectorAll('[data-booking-format]')],choices=[...form.querySelectorAll('[name=channel]')];
- const error=$('#booking-error'),status=$('#booking-status'),submit=$('#booking-submit');
- const confirm=document.createElement('p');confirm.id='booking-confirm';confirm.className='booking-confirm';confirm.setAttribute('role','alert');confirm.hidden=true;error.before(confirm);
- const submitLabel=submit.childNodes[0];
+ const error=$('#booking-error'),status=$('#booking-status'),submit=$('#booking-submit'),warning=$('#booking-contact-warning');
+ const calendar=$('#booking-calendar'),calendarLink=$('#booking-calendar-link');
  let format=params.get('format')==='offline'?'offline':'online',product=consultation?settings.consultation:format==='offline'?settings.offline:settings.course;
- let sending=false,requestId=null,submitted=false,confirming=false;
+ let sending=false,requestId=null,submitted=false;
  const money=n=>new Intl.NumberFormat('ru-RU').format(n)+' ₽';
  const dateText=date=>new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric',timeZone:'Europe/Moscow'}).format(new Date(date+'T12:00:00Z')).replace(/ г\.$/,'');
  const updateDirect=()=>{
@@ -17,19 +16,31 @@
   target.searchParams.set('text',consultation?'Вика, привет! Хочу обсудить индивидуальную консультацию.':'Вика, привет! Хочу записаться на первый поток.\n'+(format==='offline'?'Офлайн':'Онлайн')+', '+dateText(product.date)+'.');
   document.querySelectorAll('[data-direct-telegram]').forEach(a=>a.href=target.href);
  };
- const markEdited=()=>{if(sending)return;error.textContent='';status.textContent='';confirm.textContent='';confirm.hidden=true;requestId=null;submitted=false;confirming=false;submitLabel.nodeValue='Отправить';submit.disabled=false;};
+ const selectedContactsComplete=()=>{
+  const selected=choices.filter(c=>c.checked);
+  return selected.length>0&&selected.every(check=>{
+   const input=form.querySelector(`[name="${check.value}"]:not([type=checkbox])`);
+   return input&&!input.disabled&&input.value.trim().length>0;
+  });
+ };
+ const updateWarning=()=>{warning.hidden=!selectedContactsComplete();};
+ const markEdited=()=>{
+  if(sending)return;
+  error.textContent='';status.textContent='';requestId=null;submitted=false;submit.disabled=false;
+  if(calendar)calendar.hidden=true;
+  updateWarning();
+ };
  const selectFormat=value=>{
   if(sending)return;
   format=value;product=format==='offline'?settings.offline:settings.course;
   tabs.forEach(tab=>{const active=tab.dataset.bookingFormat===format;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;$('#'+tab.getAttribute('aria-controls')).hidden=!active;});
   markEdited();updateDirect();
  };
- if(consultation&& !document.querySelector('[data-booking-kind="consultation"]')){
+ if(consultation&&!document.querySelector('[data-booking-kind="consultation"]')){
   $('#booking-title').textContent='Запись на индивидуальную консультацию';$('.booking-tabs').hidden=true;
   $('#booking-offer').textContent='Три онлайн-встречи. Стоимость — '+money(product.price);
  }
  if(!consultation){
-  // Offers, submission dates and prices share the same configuration.
   for(const [name,event] of [['online',settings.course],['offline',settings.offline]]){
    const pane=$('#booking-offer-'+name);pane.querySelector('.booking-date').textContent=dateText(event.date);pane.querySelector('.booking-price').textContent='Стоимость — '+money(event.price);
   }
@@ -49,7 +60,7 @@
   error.textContent='';status.textContent='';const name=$('#booking-name'),referral=form.querySelector('[name=referral]');name.value=name.value.trim();name.setCustomValidity('');
   if(referral)referral.value=referral.value.trim();
   if(name.value.length<2)name.setCustomValidity('Напиши, пожалуйста, как к тебе обращаться');
-  if(!choices.some(c=>c.checked)){error.textContent='Выбери, где удобнее с тобой связаться';choices[0].focus();return null;}
+  if(!choices.some(c=>c.checked)){error.textContent='Выбери, где с тобой связаться';choices[0].focus();return null;}
   const contacts={};
   for(const check of choices.filter(c=>c.checked)){
    const input=form.querySelector(`[name="${check.value}"]:not([type=checkbox])`);input.value=clean(check.value,input.value);input.setCustomValidity('');
@@ -77,18 +88,27 @@
   const timer=setTimeout(()=>{cleanup();reject(new Error('timeout'));},45000);
   addEventListener('message',onMessage);document.body.append(frame,post);post.submit();
  });
+ const compactUTC=date=>date.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+ const calendarUrl=event=>{
+  const url=new URL('https://calendar.google.com/calendar/render');
+  url.searchParams.set('action','TEMPLATE');url.searchParams.set('text',event.title);url.searchParams.set('ctz',event.timeZone||'Europe/Moscow');
+  url.searchParams.set('details','Первый поток курса «Саманта: Коды к мужчинам и к себе».');
+  if(event.startISO&&event.durationMinutes){const start=new Date(event.startISO),end=new Date(start.getTime()+event.durationMinutes*60000);url.searchParams.set('dates',compactUTC(start)+'/'+compactUTC(end));}
+  else{const start=event.date.replaceAll('-',''),endDate=new Date(event.date+'T12:00:00Z');endDate.setUTCDate(endDate.getUTCDate()+1);url.searchParams.set('dates',start+'/'+endDate.toISOString().slice(0,10).replaceAll('-',''));}
+  if(event.location)url.searchParams.set('location',event.location);
+  return url.href;
+ };
  form.addEventListener('submit',async event=>{
   event.preventDefault();if(sending||submitted)return;
   const payload=collect();if(!payload)return;
-  if(!confirming){confirming=true;confirm.textContent='Проверь, что контакты указаны без ошибки, и мы сможем написать тебе с учетом настроек доступа!';confirm.hidden=false;submitLabel.nodeValue='Проверила, отправить';submit.focus();return;}
   requestId=requestId||(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Array.from(crypto.getRandomValues(new Uint32Array(4))).join('-'));
   payload.requestId=requestId;sending=true;submit.disabled=true;submit.setAttribute('aria-busy','true');
-  const controls=[...form.querySelectorAll('input:not(:disabled)'),$('#booking-name')];controls.forEach(input=>input.disabled=true);tabs.forEach(tab=>tab.disabled=true);
+  const controls=[...form.querySelectorAll('input:not(:disabled)')];controls.forEach(input=>input.disabled=true);tabs.forEach(tab=>tab.disabled=true);
   try{
    await sendToCRM(payload);submitted=true;status.textContent=consultation?'Записано! Скоро свяжемся с тобой.':'Записано! Скоро пришлем ссылку на занятие и данные для оплаты.';
+   if(!consultation&&calendar&&calendarLink){calendarLink.href=calendarUrl(product);calendar.hidden=false;}
   }catch(e){error.textContent=e.message==='not-connected'?'Форма пока недоступна. Напиши мне напрямую справа.':'Не получилось подтвердить отправку. Попробуй еще раз или напиши мне напрямую.';}
   finally{sending=false;controls.forEach(input=>input.disabled=false);tabs.forEach(tab=>tab.disabled=false);submit.disabled=submitted;submit.removeAttribute('aria-busy');}
  });
- $('#booking-name').addEventListener('input',markEdited);
- submit.disabled=false;
+ submit.disabled=false;updateWarning();
 })();
