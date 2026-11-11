@@ -11,8 +11,8 @@
   booking:Object.freeze({
    deliveryMode:'apps-script',
    deliveryEndpoint:'https://script.google.com/macros/s/AKfycbzELuPL_Nj17w-D8WHDbYXkZ8237MKYtE2HjYHDZEymgr_16Dfw_B3rpS3WMijMSpUj4w/exec',
-   course:Object.freeze({id:'level-1',format:'online',title:'Саманта: Коды к мужчинам и к себе — первый уровень',date:'2026-11-09',startISO:'2026-11-09T20:00:00+03:00',durationMinutes:120,timeZone:'Europe/Moscow',price:1800}),
-   offline:Object.freeze({id:'level-1-offline',format:'offline',title:'Саманта: Коды к мужчинам и к себе — первый уровень, офлайн',date:'2026-11-22',startISO:null,durationMinutes:null,timeZone:'Europe/Moscow',price:3500,location:'Лофт в центре Москвы — предварительная локация',preliminaryDate:true}),
+   course:Object.freeze({id:'level-1',format:'online',title:'Саманта: Коды к мужчинам и к себе — первый уровень',date:'2026-11-09',startISO:'2026-11-09T20:00:00+03:00',durationMinutes:120,timeZone:'Europe/Moscow',price:3000,dates:Object.freeze([Object.freeze({date:'2026-11-09',startISO:'2026-11-09T20:00:00+03:00'}),Object.freeze({date:'2026-11-23',startISO:'2026-11-23T20:00:00+03:00'})])}),
+   offline:Object.freeze({id:'level-1-offline',format:'offline',title:'Саманта: Коды к мужчинам и к себе — первый уровень, офлайн',date:'2026-12-01',dateLabel:'декабрь 2026',startISO:null,durationMinutes:null,timeZone:'Europe/Moscow',price:5000,location:'Лофт в центре Москвы — предварительная локация',preliminaryDate:true}),
    consultation:Object.freeze({id:'consultation',title:'Индивидуальная консультация',price:25000,meetings:3})
   })
  });

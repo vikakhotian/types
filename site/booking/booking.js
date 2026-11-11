@@ -4,10 +4,14 @@
  if(!config||!form)return;
  const settings=config.booking,$=s=>document.querySelector(s),params=new URLSearchParams(location.search);
  const consultation=!!document.querySelector('[data-booking-kind="consultation"]')||params.get('kind')==='consultation';
- const tabs=[...document.querySelectorAll('[data-booking-format]')],choices=[...form.querySelectorAll('[name=channel]')];
+ const tabs=[...document.querySelectorAll('[data-booking-format]')],choices=[...form.querySelectorAll('[name=channel]')],dateChoices=[...document.querySelectorAll('[name=course-date]')];
  const error=$('#booking-error'),status=$('#booking-status'),submit=$('#booking-submit'),warning=$('#booking-contact-warning');
  const calendar=$('#booking-calendar'),calendarLink=$('#booking-calendar-link');
- let format=params.get('format')==='offline'?'offline':'online',product=consultation?settings.consultation:format==='offline'?settings.offline:settings.course;
+ const selectedCourse=()=>{
+  const selected=dateChoices.find(choice=>choice.checked),date=settings.course.dates?.find(item=>item.date===selected?.value);
+  return date?{...settings.course,...date}:settings.course;
+ };
+ let format=params.get('format')==='offline'?'offline':'online',product=consultation?settings.consultation:format==='offline'?settings.offline:selectedCourse();
  let sending=false,requestId=null,submitted=false;
  const money=n=>new Intl.NumberFormat('ru-RU').format(n)+' ₽';
  const dateText=date=>new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric',timeZone:'Europe/Moscow'}).format(new Date(date+'T12:00:00Z')).replace(/ г\.$/,'');
@@ -32,7 +36,7 @@
  };
  const selectFormat=value=>{
   if(sending)return;
-  format=value;product=format==='offline'?settings.offline:settings.course;
+  format=value;product=format==='offline'?settings.offline:selectedCourse();
   tabs.forEach(tab=>{const active=tab.dataset.bookingFormat===format;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;$('#'+tab.getAttribute('aria-controls')).hidden=!active;});
   markEdited();updateDirect();
  };
@@ -42,12 +46,13 @@
  }
  if(!consultation){
   for(const [name,event] of [['online',settings.course],['offline',settings.offline]]){
-   const pane=$('#booking-offer-'+name);pane.querySelector('.booking-date').textContent=dateText(event.date);pane.querySelector('.booking-price').textContent='Стоимость — '+money(event.price);
+   const pane=$('#booking-offer-'+name),date=pane.querySelector('.booking-date');if(date)date.textContent=event.dateLabel||dateText(event.date);pane.querySelector('.booking-price').textContent='Стоимость — '+money(event.price);
   }
   tabs.forEach(tab=>{
    tab.addEventListener('click',()=>selectFormat(tab.dataset.bookingFormat));
    tab.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const next=e.key==='Home'?tabs[0]:e.key==='End'?tabs.at(-1):tabs[(tabs.indexOf(tab)+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length];next.focus();selectFormat(next.dataset.bookingFormat);});
   });selectFormat(format);
+  dateChoices.forEach(choice=>choice.addEventListener('change',()=>{if(!choice.checked||sending)return;product=selectedCourse();markEdited();updateDirect();}));
  }
  updateDirect();
  choices.forEach(check=>check.addEventListener('change',()=>{
@@ -106,7 +111,7 @@
   const controls=[...form.querySelectorAll('input:not(:disabled)')];controls.forEach(input=>input.disabled=true);tabs.forEach(tab=>tab.disabled=true);
   try{
    await sendToCRM(payload);submitted=true;status.textContent=consultation?'Записано! Скоро свяжемся с тобой.':'Записано! Скоро пришлем ссылку на занятие и данные для оплаты.';
-   if(!consultation&&calendar&&calendarLink){calendarLink.href=calendarUrl(product);calendar.hidden=false;}
+   if(!consultation&&product.startISO&&calendar&&calendarLink){calendarLink.href=calendarUrl(product);calendar.hidden=false;}
   }catch(e){error.textContent=e.message==='not-connected'?'Форма пока недоступна. Напиши мне напрямую справа.':'Не получилось подтвердить отправку. Попробуй еще раз или напиши мне напрямую.';}
   finally{sending=false;controls.forEach(input=>input.disabled=false);tabs.forEach(tab=>tab.disabled=false);submit.disabled=submitted;submit.removeAttribute('aria-busy');}
  });

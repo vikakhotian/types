@@ -255,3 +255,12 @@
  .booking-calendar{padding:21px 18px}
 }
 @media(max-width:390px){.booking-aside .direct-contacts{grid-template-columns:1fr}}
+
+/* Version 27: two online dates and a stronger green booking action. */
+.course-date-choice{border:0;margin:9px 0 4px;padding:0}.course-date-choice legend{font-family:Neucha,cursive;font-size:16px;color:#65483a;margin-bottom:8px}.course-date-options{display:flex;align-items:center;gap:11px;flex-wrap:wrap}.course-date-options label{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:Caveat,cursive;font-size:29px;font-weight:600;color:#593e34}.course-date-options input{appearance:none;width:20px;height:20px;margin:0;border:1.5px solid #739e91;border-radius:5px 2px 5px 3px;background:#fffdf8;display:grid;place-items:center;cursor:pointer}.course-date-options input:checked:after{content:'✓';font-family:Golos,sans-serif;font-size:17px;font-weight:700;line-height:1;color:#477c6d}.course-date-options input:focus-visible{outline:2px dashed #6f9d90;outline-offset:4px}.date-or{font-family:Caveat,cursive;font-size:22px;color:#9a806c}
+#booking-submit{margin-top:5px;padding:10px 18px!important;border:1.5px solid #76a799!important;border-radius:14px 7px 13px 8px!important;background:#f2faf6!important;color:#356b5d!important;box-shadow:3px 4px 0 rgba(111,157,144,.24)!important}
+#booking-submit:before{left:14px!important;right:57px!important;bottom:9px!important;height:15px!important;background:#b9deda!important;opacity:.95}
+#booking-submit:hover:before{height:24px!important;background:#90cbc4!important}
+#booking-submit .action-arrow{color:#4d8979;transform:rotate(180deg);width:50px;height:38px}
+#booking-submit:hover .action-arrow{transform:rotate(180deg) translate(-3px,2px)}
+@media(max-width:390px){.course-date-options label{font-size:26px}.course-date-options{gap:8px}}
